@@ -4,10 +4,6 @@ My personal blueprint for AI-assisted software development — principles, playb
 
 Each file is a focused rulebook that can be loaded on demand. Drop the whole thing into `~/.claude/`, or copy the bits you want into a new project.
 
-## The story
-
-> *Placeholder — to be replaced with the LinkedIn post that motivated this repo. Short version: a senior engineer retired, I was responsible for his codebase, and instead of booking a flight I started thinking about tokens. This is the process that made that possible.*
-
 ## What's in here
 
 ### Baseline (applies to every step)
