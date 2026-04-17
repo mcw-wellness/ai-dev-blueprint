@@ -2,7 +2,7 @@
 
 When the decision is made to replace legacy code — regardless of the trigger — don't start porting line-by-line. Start by *understanding*.
 
-This playbook is black-box-first: treat the legacy code as a specification you need to recover, not as scaffolding you need to translate.
+Treat the legacy code as a specification to recover, not scaffolding to translate: read for *what* it does, not *how* it does it. The understanding phase is white-box — you read the source, but extract intent, not mechanics. The final acceptance gate is black-box parity via [shadow replay](how-to-shadow-replay.md).
 
 ## When to use this
 
