@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(pwd)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(rg:*)",
+      "Bash(pytest:*)",
+      "Bash(npm test:*)",
+      "Bash(ruff check:*)",
+      "Bash(mypy:*)"
+    ]
+  },
+  "hooks": {},
+  "env": {}
+}

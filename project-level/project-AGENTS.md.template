@@ -1,0 +1,64 @@
+# [Project Name]
+
+## Purpose
+
+[One paragraph: what this project does and why it exists.]
+
+## Development Process
+
+This project follows the [ai-dev-blueprint](https://github.com/kaza/ai-dev-blueprint). All principles and playbooks apply:
+
+- **Baseline:** KISS, YAGNI, TDD, spec-anchored (see `philosophy.md`, `spec-anchored.md` in the blueprint)
+- **Triple AI review is STRICTLY MANDATORY** for every PR: Gemini + Codex + CodeRabbit. See `how-to-review-code.md`.
+- **Regression prevention:** every review finding that results in a code fix MUST have a corresponding automated test that would have caught it.
+
+### Project-specific overrides
+
+This section documents where **this project deviates from the blueprint**. Leave empty if no deviations. Real examples of what goes here:
+
+- **Fast track:** Disabled — all PRs go through full triple review (Gemini + Codex + CodeRabbit). Reason: production cutover stakes; one bad merge is a revenue incident.
+- **Extra reviewer:** Security review (`/security-review`) is mandatory for any change to auth, session, or token-handling code.
+- **Spec location:** Specs live in `docs/specs/` rather than `specs/` (pre-existing convention in this repo).
+- **Test threshold:** Unit-test coverage floor is 90% (raised from blueprint default of no threshold) due to regulated-system requirements.
+- **Experiments:** Disabled — this project is production-only; any exploration happens in a separate `<project>-experiments` repo.
+- **Fast-track single reviewer:** CodeRabbit only (Codex unavailable here due to repo-size limits).
+
+If there are no deviations, write: "No overrides — blueprint defaults apply as-is."
+
+## Architecture
+
+[Short overview of the system design. Link to `specs/architecture.md` for details.]
+
+## Project structure
+
+```
+src/                  — Main package
+tests/
+  unit/               — Unit tests (mirrors src/ structure)
+  integration/        — Integration tests
+specs/                — Feature and architecture specs
+  decisions/          — ADRs (NNN-short-slug.md)
+experiments/          — Exploratory work (YYYY-MM-DD_<desc>/)
+scripts/              — Utility scripts
+```
+
+## Status docs
+
+- `ROADMAP.md` — Single source of truth for what's done, what's left
+
+## Key commands
+
+```bash
+# Tests
+pytest                                    # or project equivalent
+
+# Linting
+ruff check                                # or project equivalent
+
+# Type checking
+mypy                                      # or project equivalent
+```
+
+## Reference material
+
+[Link to any external reference repos, docs, or legacy systems this project depends on. Use pinned URLs (e.g., GitHub `master` branch links), not local paths.]
