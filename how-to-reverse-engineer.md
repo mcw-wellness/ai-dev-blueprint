@@ -1,6 +1,6 @@
 # How to reverse-engineer a legacy codebase
 
-When a senior engineer leaves and you inherit code you didn't write, don't panic and don't start porting line-by-line. Start by *understanding*.
+When the decision is made to replace legacy code — regardless of the trigger — don't start porting line-by-line. Start by *understanding*.
 
 This playbook is black-box-first: treat the legacy code as a specification you need to recover, not as scaffolding you need to translate.
 
