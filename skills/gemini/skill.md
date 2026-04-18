@@ -304,7 +304,7 @@ gemini --approval-mode yolo -m pro -p "<template with Topic=<x>, no Project Back
 
 Example user invocation:
 ```
-/gemini brainstorm "how to eliminate TickDB" --context enterprise-dataflow/tickdb-elimination-plan.md enterprise-dataflow/enterprise-data-lifecycle.md --style practical
+/gemini brainstorm "how to migrate off the legacy message queue" --context enterprise-dataflow/migration-plan.md enterprise-dataflow/data-lifecycle.md --style practical
 ```
 → Skill reads both files, builds the template, runs gemini.
 
@@ -324,7 +324,7 @@ gemini --approval-mode yolo -m pro -p "<question>"
 
 1. **Parse args** to pick a subcommand. If ambiguous: lookup/current-info → `search`; open-ended/creative → `brainstorm`; diff/PR/commit/file review → `review` (default; use `review-principal` only if user says "rigorous", "strict", "principal", or asks for "bug hunt"); otherwise → `ask`.
 2. **Always** use `-m pro --approval-mode yolo -p`.
-3. **Sandbox check — before running any Gemini command that references absolute file paths in the prompt**: scan those paths. If any path is outside the current working directory (and its descendants), append `--include-directories <path>` for each root that's outside. Example: a spec in `/a/b/poc-repo/...` referencing C++ in `/a/b/validus/...` needs `--include-directories /a/b/validus`. Failing to do this **silently degrades the review** — Gemini will fall back to web_fetch, 404, and produce findings based only on files it could actually read.
+3. **Sandbox check — before running any Gemini command that references absolute file paths in the prompt**: scan those paths. If any path is outside the current working directory (and its descendants), append `--include-directories <path>` for each root that's outside. Example: a spec in `/a/b/poc-repo/...` referencing C++ in `/a/b/legacy-system/...` needs `--include-directories /a/b/legacy-system`. Failing to do this **silently degrades the review** — Gemini will fall back to web_fetch, 404, and produce findings based only on files it could actually read.
 4. For `review` AND `review-principal`:
    - Auto-detect content type + language from the file extension (use the tables above).
    - Treat `.md` and other prose as `document`, not `code`.
@@ -372,7 +372,7 @@ Add `--include-directories <path>` (repeatable, or comma-separated) for each ext
 
 ```bash
 gemini --approval-mode yolo \
-  --include-directories /Users/almir/Documents/GitHub/eventus/validus \
+  --include-directories /Users/almir/Documents/GitHub/eventus/payments-service \
   -m pro -p "<prompt that references both repos>"
 ```
 
@@ -429,7 +429,7 @@ Both surface as tool failures in the log. Check the error message:
 - `/gemini review-principal --file src/auth.py` — rigorous bug-hunt on a high-stakes file
 - `/gemini review-principal --base main` — principal-style pre-merge review of a branch
 - `/gemini brainstorm "names for the ingestion service" --style practical --count 8`
-- `/gemini brainstorm "how to eliminate TickDB" --context enterprise-dataflow/tickdb-elimination-plan.md --style practical`
+- `/gemini brainstorm "how to migrate off the legacy message queue" --context enterprise-dataflow/migration-plan.md --style practical`
 - `/gemini ask "difference between ReplicatedMergeTree and SharedMergeTree?"`
 
 ### Cross-repo review (sibling directory)
@@ -438,7 +438,7 @@ When auditing a spec in repo A against source code in sibling repo B, the invoca
 
 ```bash
 gemini --approval-mode yolo -m pro \
-  --include-directories /Users/almir/Documents/GitHub/eventus/validus \
+  --include-directories /Users/almir/Documents/GitHub/eventus/payments-service \
   -p "<prompt referencing absolute paths in both repos>"
 ```
 
