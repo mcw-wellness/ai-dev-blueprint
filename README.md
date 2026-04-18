@@ -11,6 +11,10 @@ Each file is a focused rulebook that can be loaded on demand. Drop the whole thi
 - [`spec-anchored.md`](spec-anchored.md) — spec vs finding vs ADR, Q-NNN open questions, documentation structure
 - [`tool-usage.md`](tool-usage.md) — when to use Gemini / Codex / CodeRabbit / Perplexity
 
+### Machine & personal config (auto-loaded via `AGENTS.md`)
+- [`setup.md`](setup.md) — multi-machine paths, multi-instance Claude Code layout, MCP servers
+- [`preferences.md`](preferences.md) — Git workflow, memory preferences
+
 ### Playbooks (read on demand)
 - [`how-to-develop.md`](how-to-develop.md) — the 8-step loop + fast track for bug fixes
 - [`how-to-review-spec.md`](how-to-review-spec.md) — pre-code plan review (Gemini + Codex)
@@ -38,25 +42,42 @@ User-level methodology is stable and universal. Project-level context is volatil
 
 ## How to adopt
 
-### User-level (symlink, one-time)
+### User-level (one-time per machine)
+
+The blueprint is designed to be cloned to the **same path relative to `~`** on every machine (macOS, WSL, Windows native). `~` expands to the right home directory on each. See [`setup.md`](setup.md) for the platform path table and the Windows-native fallback.
 
 ```bash
-# Clone the blueprint somewhere you'll keep it
-git clone git@github.com:kaza/ai-dev-blueprint ~/code/ai-dev-blueprint
+# 1. Clone the blueprint (same relative path on every machine)
+git clone git@github.com:kaza/ai-dev-blueprint ~/Documents/GitHub/ai-dev-blueprint
 
-# Symlink user-level files into ~/.claude/ so `git pull` updates everywhere
-cd ~/.claude
-ln -sf ~/code/ai-dev-blueprint/AGENTS.md CLAUDE.md
-for f in philosophy spec-anchored tool-usage how-to-*; do
-  ln -sf ~/code/ai-dev-blueprint/$f.md .
+# 2. Point ~/.claude/CLAUDE.md at the blueprint's AGENTS.md
+echo '@~/Documents/GitHub/ai-dev-blueprint/AGENTS.md' > ~/.claude/CLAUDE.md
+
+# 3. Symlink skills so `git pull` keeps them in sync
+for s in gemini codex-review chrome-troubleshooting; do
+  ln -sf ~/Documents/GitHub/ai-dev-blueprint/skills/$s ~/.claude/skills/$s
 done
-
-# Skills
-ln -sf ~/code/ai-dev-blueprint/skills/gemini skills/
-ln -sf ~/code/ai-dev-blueprint/skills/codex-review skills/
 ```
 
-Now `git pull` in `~/code/ai-dev-blueprint` updates your methodology across every project.
+`AGENTS.md` already `@`-imports `setup.md`, `preferences.md`, and the playbook links, so those load automatically — no per-file symlinks needed for the `.md` playbooks.
+
+### Multi-instance (if you run more than one Claude Code account on the same machine)
+
+See [`setup.md`](setup.md) for the convention. In short, per-instance config dirs (`~/.claude-<name>/`) symlink `CLAUDE.md`, `skills/`, `plugins/`, `chrome/` back to the default `~/.claude/`:
+
+```bash
+for instance in eventus tcp almir; do
+  for item in CLAUDE.md skills plugins chrome; do
+    ln -sf ~/.claude/$item ~/.claude-$instance/$item
+  done
+done
+```
+
+After that, **you only adopt the blueprint into `~/.claude/`** — the other instances inherit via the symlinks.
+
+### Updating across machines
+
+`git pull` in `~/Documents/GitHub/ai-dev-blueprint` updates methodology, setup, preferences, skills — everywhere, on every machine. Nothing else to sync.
 
 ### Project-level (copy, then edit)
 

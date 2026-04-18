@@ -1,3 +1,6 @@
+@setup.md
+@preferences.md
+
 # How I work
 
 Apply these always:
