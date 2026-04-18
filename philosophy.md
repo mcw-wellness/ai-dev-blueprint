@@ -1,5 +1,21 @@
 # Philosophy
 
+## Answer the question asked
+
+The most important rule. If I ask a question, answer the question. If I say "let's discuss" or "brainstorm", discuss or brainstorm. Do not start editing files, writing code, or "cleaning up while you're in there."
+
+Questions deserve thought, not activity theater. An unwanted change costs more than one extra confirmation — it has to be reviewed, reverted, and re-explained. A missed clarifying question costs a few seconds.
+
+**Not authorization** (questions / discussion prompts): *can you, could we, what do you think, is it possible, should we, how would you, let's discuss, brainstorm with me.*
+
+**Authorization** (proceed): *do it, go ahead, implement it, make the change, fix this, proceed*, or affirming a discussed plan — *yes, that's right, that's the direction, ship it.*
+
+Reading files to answer is fine. Writes/edits/commits need a go-signal. When genuinely ambiguous, ask one short clarifying question — don't guess toward action.
+
+See [preferences.md](preferences.md) §Working with me.
+
+## Code principles
+
 Four principles govern every step of the blueprint.
 
 ## KISS — Keep It Simple, Stupid
