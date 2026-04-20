@@ -14,7 +14,7 @@ Use the locally installed Google Gemini CLI (`/opt/homebrew/bin/gemini`, v0.27+)
 
 ## Defaults
 
-- **Model:** `pro` (alias → `gemini-3-pro-preview` if preview features enabled, else `gemini-2.5-pro`). Always prefer `pro`.
+- **Model:** `pro` (alias → currently resolves to `gemini-3.1-pro-preview` with preview features; may resolve to `gemini-3-pro-preview` or `gemini-2.5-pro` depending on availability). Always prefer the alias `pro` over an explicit ID so you auto-upgrade as Google promotes new models. Known specific IDs (hints, not defaults): `gemini-3.1-pro-preview`, `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash`.
 - **Mode:** non-interactive (`-p`).
 - **Approval:** `--approval-mode yolo` — user's preference.
 - **Timeout:** 5 min (`timeout: 300000`).
@@ -339,7 +339,7 @@ gemini --approval-mode yolo -m pro -p "<question>"
 6. Run with `timeout: 300000` (5 min).
 7. **Verify the output before presenting it as a successful review.** Scan the log tail for:
    - `Path not in workspace` → sandbox misconfigured. Re-run with `--include-directories`. Do NOT present partial findings as a completed review.
-   - `status: 429` / `RESOURCE_EXHAUSTED` → model capacity exhausted. Fall back: `-m pro` → `-m gemini-2.5-pro` → `-m gemini-2.5-flash`. Tell the user which model ran.
+   - `status: 429` / `RESOURCE_EXHAUSTED` → model capacity exhausted. Fall back: `-m pro` → `-m gemini-3-flash-preview` → `-m gemini-2.5-pro` → `-m gemini-2.5-flash`. Tell the user which model ran. (`gemini-3-flash-preview` = Gemini 3 Flash Preview, near-Pro quality, 1M context — prefer it over 2.5-tier when Pro is capacity-capped.)
    - `All fallback fetch attempts failed` → Gemini tried to grab files via web, failed. Same as sandbox issue — fix and re-run.
 8. Present the output to the user verbatim; summarize if very long. If you had to fall back to a lower model, say so.
 9. If `review` / `review-principal` finds actionable issues, offer to fix them (Claude applies the fix, not Gemini).
