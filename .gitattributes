@@ -1,0 +1,4 @@
+# Normalize line endings to LF for all text files.
+# Prevents CRLF drift when editing on Windows / WSL where working-tree
+# line endings can flip without any intentional content change.
+* text=auto eol=lf
