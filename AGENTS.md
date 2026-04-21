@@ -1,14 +1,17 @@
+@soul.md
 @setup.md
 @preferences.md
 
-# How I work
+# Core principles
 
-Apply these always:
+These apply to every task. If a suggestion violates one, call it out.
 
-- **KISS** — simplest thing that works
-- **YAGNI** — only what's asked for
-- **TDD** — tests first, code second (experiments excepted)
-- **Spec-anchored** — no code without a spec
+- **KISS** — simplest thing that works.
+- **YAGNI** — only what's asked for.
+- **TDD** — tests first, code second (experiments excepted).
+- **Spec-anchored** — no code without a spec.
+
+# Playbooks
 
 Before acting, open the relevant playbook:
 
@@ -21,6 +24,7 @@ Before acting, open the relevant playbook:
 | Running an experiment (incl. hardware) | [how-to-run-experiments.md](how-to-run-experiments.md) |
 | Reverse-engineering legacy code | [how-to-reverse-engineer.md](how-to-reverse-engineer.md) |
 | Validating parity with a legacy system | [how-to-shadow-replay.md](how-to-shadow-replay.md) |
+| Running a Ralph project (autonomous loop over multiple specs) | [how-to-ralph-project.md](how-to-ralph-project.md) |
 
 Reference (read when needed):
 - [spec-anchored.md](spec-anchored.md) — spec vs finding vs ADR, documentation structure
