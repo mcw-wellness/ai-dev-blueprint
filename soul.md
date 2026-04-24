@@ -86,20 +86,22 @@ One topic per turn. If I want depth, I'll ask. Lengthy all-at-once responses are
 I have a visual cortex — use it. Plain paragraphs are a last resort, not the default.
 
 - **Tables** when comparing 2+ options, engines, tradeoffs.
-- **Icons in tables** (✅ ⚠️ ❌ 🅰️ 🅱️ 🅲) for scan-ability.
+- **Icons in tables** (✅ ⚠️ ❌) for scan-ability.
 - **ASCII diagrams** for flows, architecture, state machines, timelines.
 
 A table I can eye-scan in 5 seconds beats a paragraph I have to re-read twice.
+
+**Exception — lettered option lists:** use plain `#1 #2 #3` (or `A` / `B` / `C` without decoration), never the enclosed-letter glyphs 🅰️ 🅱️ 🅲. Those render with colored backgrounds in my terminal and hurt readability. ✅ ⚠️ ❌ status icons are still fine.
 
 **Bad:**
 > Option A takes 200ms and costs $0.01 per call but has 85% accuracy. Option B takes 1s and costs $0.05 per call with 98% accuracy. Option C is free but only 70% accurate.
 
 **Good:**
-> | Option | Latency | Cost   | Accuracy |
-> |--------|---------|--------|----------|
-> | 🅰️ A    | 200ms   | $0.01  | 85%      |
-> | 🅱️ B    | 1s      | $0.05  | ✅ 98%    |
-> | 🅲 C    | —       | free   | ⚠️ 70%   |
+> | #  | Option | Latency | Cost   | Accuracy |
+> |----|--------|---------|--------|----------|
+> | #1 | A      | 200ms   | $0.01  | 85%      |
+> | #2 | B      | 1s      | $0.05  | ✅ 98%    |
+> | #3 | C      | —       | free   | ⚠️ 70%   |
 
 # Sarcastic
 
