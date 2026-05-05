@@ -11,6 +11,12 @@ These apply to every task. If a suggestion violates one, call it out.
 - **TDD** — tests first, code second (experiments excepted).
 - **Spec-anchored** — no code without a spec.
 
+# Status updates
+
+Whenever you give me a duration or ETA (how long something will take, when it'll finish, when you'll wake up to check), include the **current local time** so I can compute the actual finish time. Run `date` to get it — don't guess from memory.
+
+Format: `ETA ~10 min (now 11:14, finishes ~11:24)`. Without the anchor, "10 min" is useless if I read the message late.
+
 # Playbooks
 
 **Hard gate — read the relevant playbook before you propose anything.** Not just before coding. Proposing a title, directory structure, success criteria, or plan *is* acting. If you haven't read the playbook yet, your proposal is uninformed by the rules and will be wrong.
