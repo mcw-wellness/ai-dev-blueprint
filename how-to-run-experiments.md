@@ -25,6 +25,8 @@
 - **Run multiple times** — single run proves nothing.
 - **One experiment at a time** — never run experiments in parallel. Slow and systematic.
 - **Document failures** — they're MORE valuable than successes.
+- **Audit log is living** — update `audit-log.md` immediately after each attempt, not at the end of the session. A log reconstructed from memory is fiction, not evidence.
+- **Findings: append when relevant.** Add to `findings.md` when an observation is relevant to the hypothesis (supports, contradicts, or qualifies it) or opens a new hypothesis worth investigating. No threshold, no approval gate — just cite the audit attempt + log that backs it. Revisable: amend in place with a dated note if new evidence changes the picture.
 - **Findings are not specs** — experiments produce findings about things you don't control. Specs describe what you build.
 
 ## Especially for hardware
@@ -43,13 +45,16 @@ Each project defines where experiments live. Standard layout:
 
 ```
 YYYY-MM-DD_<short-description>/
-├── AGENTS.md       # Ground rules, hypothesis, what we're trying to achieve and WHY
-├── audit-log.md    # Structured record: each attempt as an entry
-├── README.md       # Optional: background context, setup notes, links
+├── AGENTS.md       # Hypothesis, WHY, success criteria, setup, ground rules, links — the single human+agent doc
+├── audit-log.md    # Structured record: one entry per attempt, updated immediately after each
 ├── findings.md     # Optional: durable observations extracted from this experiment
 ├── scan.py / run.sh / *  # Experiment scripts live INSIDE the experiment dir
 └── logs/           # Raw output — commit these as evidence
 ```
+
+**No `README.md` in experiment directories.** Everything a human or agent needs to orient — background, setup, how to run, links — belongs in `AGENTS.md`. A separate README invites duplication and drift; use one doc.
+
+*Legacy note:* older experiments were created with a `README.md` alongside `AGENTS.md`. Existing ones can stay as-is — no forced migration — but **don't create new ones**. If you touch an old experiment and it's easy to fold the README into `AGENTS.md`, do it; otherwise leave it.
 
 **Scripts belong inside the experiment directory, not in the repo-wide `scripts/` dir.** Experiments are allowed to hack — keeping the script next to its `AGENTS.md` keeps results reproducible, scoped, and teardown-atomic. If a script proves out, **promote it deliberately** to `scripts/` or `src/` with tests — that is a separate, conscious step. Don't let experimental scripts silently become production dependencies.
 

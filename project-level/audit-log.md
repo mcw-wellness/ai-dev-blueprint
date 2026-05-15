@@ -1,5 +1,7 @@
 # Audit Log
 
+> **Update immediately after each attempt, not at the end.** A log reconstructed from memory is fiction — it omits what surprised you, the failed side-paths, and the exact command you actually ran. Write the entry while the terminal is still open.
+
 ## Attempt 1 — [short description]
 **Date:** YYYY-MM-DD HH:MM
 **Variable changed:** What single thing was changed
