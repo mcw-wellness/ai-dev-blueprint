@@ -399,10 +399,14 @@ The CLI auto-retries with backoff; after 10 failed attempts it errors out. Previ
 
 ### Fallback chain when `-m pro` fails
 
+**A 429 is NOT the end of the review — it means switch models.** Never report "Gemini unavailable" on a single 429; walk the chain first. This is mandatory **whether you invoked the skill or ran `gemini` directly via Bash** — running gemini raw does not exempt you from the fallback.
+
 1. First attempt: `-m pro` (preview if enabled, else 2.5-pro).
-2. If 429 with `MODEL_CAPACITY_EXHAUSTED`: retry with an explicit stable model `-m gemini-2.5-pro`.
-3. If that also 429s: retry with `-m gemini-2.5-flash` — lower quality but usually has capacity. Note in the output that the review used flash, not pro, so the user can rerun later.
-4. If *everything* is 429: wait and retry, OR fall back to `/codex-review` alone. Tell the user — never silently skip Gemini; triple-AI review is a project requirement per this project's `CLAUDE.md`.
+2. If 429 with `MODEL_CAPACITY_EXHAUSTED`: retry with `-m gemini-3-flash-preview` — Gemini 3 Flash, near-Pro quality, 1M context, usually has capacity when Pro doesn't. **This is the preferred fallback.**
+3. If that also 429s: `-m gemini-2.5-pro`.
+4. If that also 429s: `-m gemini-2.5-flash` — lowest quality but almost always available.
+5. Always tell the user which model actually ran, so they can rerun on Pro later.
+6. If *everything* is 429: wait and retry, OR fall back to `/codex-review` alone. Tell the user — never silently skip Gemini; triple-AI review is a project requirement per this project's `CLAUDE.md`.
 
 ### Distinguishing capacity errors from sandbox errors
 

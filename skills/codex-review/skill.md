@@ -16,6 +16,8 @@ Use the locally installed OpenAI Codex CLI (`/opt/homebrew/bin/codex`) to get a 
 
 - **Binary:** `/opt/homebrew/bin/codex`.
 - **Non-interactive mode:** `codex exec "<prompt>"` or `codex review --uncommitted`.
+- **Always close stdin: `codex exec "<prompt>" < /dev/null`.** Without it, `codex exec` blocks waiting on stdin when there is no interactive TTY (background tasks, piped invocations, agent runs) — it prints `Reading additional input from stdin...` and hangs until the timeout kills it. This is the #1 cause of "Codex hung with no output". The prompt belongs in the argument; stdin must be empty.
+- **Reasoning effort:** the default comes from `~/.codex/config.toml` (`model_reasoning_effort`, currently `medium`). Override per-run with `-c model_reasoning_effort=high` for a tricky review, or `xhigh` for a genuinely hard bug hunt / deep audit. Leave it at `medium` for routine diff reviews — bumping effort costs latency and tokens for little gain on simple changes.
 - **Sandbox (default):** read-only. Codex can read any file on the filesystem. It cannot write by default. Good for audits and Q&A; bad for tasks that need Codex to edit.
 - **Mode selection flags:**
   - `codex exec` — run the agent with a free-form prompt. Codex decides which files to read.
@@ -110,10 +112,10 @@ Find every place the spec (a) diverges from the source, (b) omits behavior the s
 
 Output: per-section severity-graded findings with file:line citations for the source.
 EOF
-)"
+)" < /dev/null
 ```
 
-The leading "run `wc -l`" instruction is deliberate — it forces Codex to prove it can reach every file before it starts reasoning. If it can't, it'll say so and stop, rather than fabricating.
+The `< /dev/null` is mandatory — see Defaults. The leading "run `wc -l`" instruction is deliberate — it forces Codex to prove it can reach every file before it starts reasoning. If it can't, it'll say so and stop, rather than fabricating.
 
 ## Instructions for the agent running this skill
 
@@ -122,6 +124,7 @@ The leading "run `wc -l`" instruction is deliberate — it forces Codex to prove
    - `review` / `--base` / `--commit` keywords → the diff-review subcommand.
    - Anything else → `codex exec "<prompt>"`.
    - `ask "<question>"` or user phrase implying a question → `codex exec "<question>"`.
+   - **Every `codex exec` invocation MUST end with `< /dev/null`** — otherwise it hangs on stdin. Non-negotiable.
 2. **Timeout**:
    - Short questions / diff review of small changes → 5 min (`timeout: 300000`).
    - Spec audits, cross-repo comparisons, anything that must read 1000+ lines → 10 min (`timeout: 600000`).
@@ -138,7 +141,7 @@ The leading "run `wc -l`" instruction is deliberate — it forces Codex to prove
 
 Only override on explicit user request:
 
-- `-m <model>` — use a different model. Default is fine for most work.
+- `-m <model>` — use a different model. **Default is fine for most work — prefer omitting the flag.** When using a ChatGPT account, `gpt-5-codex` is rejected (`"The 'gpt-5-codex' model is not supported when using Codex with a ChatGPT account."`); use the default (no `-m`) or pass `-m gpt-5.5`.
 - `-s read-only` — explicit read-only (belt and suspenders; this is also the default).
 - `-s workspace-write` — needed if Codex should be allowed to write files in the workspace. Implies read access remains full.
 - `-s danger-full-access` — full read+write+exec. Avoid unless the user is asking for an autonomous edit session and accepts the risk.
@@ -149,11 +152,13 @@ Only override on explicit user request:
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| Codex hangs with no output; log tail shows `Reading additional input from stdin...` | `codex exec` is blocking on stdin — no TTY (background or piped invocation) | Always invoke as `codex exec "<prompt>" < /dev/null`. The #1 Codex failure mode. |
 | Review claims files are "not accessible" | Filesystem perms OR restrictive `~/.codex/config.toml` | `ls -la <file>`; inspect config.toml for `sandbox_permissions` |
 | Review returns generic findings, no file:line citations | Codex didn't actually read the files it was asked about | Rerun with an explicit "prove-you-read-them-first" prompt |
 | Process times out mid-audit | Large cross-repo audit exceeded 5 min | Re-invoke with `timeout: 600000` and `run_in_background: true` |
 | `codex review --uncommitted` shows no diff | Working tree is clean OR changes are staged in a state Codex doesn't consider "uncommitted" | `git status`; use `--base <branch>` or stage changes |
 | Codex asks clarifying questions in `exec` mode | Prompt was ambiguous; Codex stalled asking for confirmation | Prompt more directly: "Do this without asking for confirmation", "Apply immediately" |
+| `Exit code 1` with `"The '<model>' model is not supported when using Codex with a ChatGPT account"` | Passed `-m <model>` that isn't allowed on ChatGPT-account Codex (e.g. `gpt-5-codex`) | Drop the `-m` flag (use the default) or pass `-m gpt-5.5`. |
 
 ## Examples
 
