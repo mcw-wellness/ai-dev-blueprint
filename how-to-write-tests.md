@@ -100,6 +100,21 @@ Multiple asserts in one test are fine when they verify different facets of one b
 
 Test through the same interface your callers use. If a function is private/internal, test it through the public function that calls it.
 
+## Rule 16: The Beyoncé Rule — "If you liked it, you should have put a test on it"
+
+From Google's SWE Book. If a behaviour matters, it has a test, and **CI is the
+source of truth** for what's protected.
+
+A change that passes CI is allowed to ship. If it broke a behaviour that had **no
+test**, the burden is on whoever owned that behaviour for never testing it — not on
+the author of the change. The fix is to add the missing test, not to blame the
+change.
+
+Practical takeaway: **put a test on anything you want kept.** Untested behaviour is
+fair game to break — that's the deal. This is also why "tests first" matters: the
+test is how you stake your claim on a behaviour before someone else's change can
+quietly remove it.
+
 ## Test Types
 
 | Type | What it tests | Dependencies | Speed |
