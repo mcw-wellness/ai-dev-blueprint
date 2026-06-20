@@ -23,6 +23,7 @@ Use the locally installed OpenAI Codex CLI (`/opt/homebrew/bin/codex`) to get a 
   - `codex exec` — run the agent with a free-form prompt. Codex decides which files to read.
   - `codex review --uncommitted` / `--base <branch>` / `--commit <sha>` — structured review of a diff.
 - **Timeout:** 5 min default (`timeout: 300000`). For spec↔source audits that span 1000+ lines across multiple files, use 10 min (`timeout: 600000`) and run in the background.
+- **Image generation:** Codex has an internal image-gen tool. Invoke with `codex exec --sandbox workspace-write "<visual prompt>. Save to <ABS_PATH>." < /dev/null` — sandbox MUST be `workspace-write` so it can copy from `~/.codex/generated_images/<session>/` to your path. **Fire sequentially, not in parallel** — concurrent calls produce duplicate output files. Gemini CLI does NOT have a real image-gen tool (it silently falls back to writing PIL scripts).
 
 ## How Codex reads files (important context)
 
@@ -74,12 +75,30 @@ codex review --base main
 codex review --commit HEAD
 ```
 
-**Custom focus prompt:**
-```bash
-codex review --uncommitted "Focus on security and error handling"
+**Custom focus prompt — NOT via `codex review`.** ⚠️ In codex-cli **0.132.0+** the diff
+selector flags (`--uncommitted` / `--base` / `--commit`, incl. the `-` stdin form) are
+**mutually exclusive with the `[PROMPT]` argument** — clap rejects them at parse time:
+
+```
+$ codex review --uncommitted "Focus on security"
+error: the argument '--uncommitted' cannot be used with '[PROMPT]'
 ```
 
-Prefer `review` when you want Codex to operate on a well-defined diff. Prefer `exec` (below) when the audit is broader than a diff (spec↔source parity, architecture question, cross-repo comparison).
+So `codex review` is **plain selection only, no focus text**. To review a diff *with*
+focus instructions, use `codex exec` and tell it which diff to read (the always-works
+path — it never conflicts and reads `git diff` itself):
+
+```bash
+codex exec "Run \`git --no-pager diff\` (uncommitted changes) and review it. \
+Focus on security and error handling. List real issues with severity, or say it's clean." < /dev/null
+# base branch:  ... Run `git --no-pager diff main...HEAD` ...
+# a commit:     ... Run `git --no-pager show <sha>` ...
+```
+
+Prefer bare `codex review --uncommitted` (no prompt) only when you want Codex's default
+review with no custom focus. The moment you need focus → `codex exec`.
+
+Prefer `review` when you want Codex to operate on a well-defined diff with no custom focus. Prefer `exec` (below) for a focused diff review, or when the audit is broader than a diff (spec↔source parity, architecture question, cross-repo comparison).
 
 ### 2. `exec` / `ask` — free-form prompt
 
@@ -120,8 +139,9 @@ The `< /dev/null` is mandatory — see Defaults. The leading "run `wc -l`" instr
 ## Instructions for the agent running this skill
 
 1. **Parse args**:
-   - No args → `codex review --uncommitted`.
-   - `review` / `--base` / `--commit` keywords → the diff-review subcommand.
+   - No args, **no focus text** → `codex review --uncommitted` (bare).
+   - `review` / `--base` / `--commit` keywords with **no focus text** → the bare diff-review subcommand (`codex review --base <b>` / `--commit <sha>`).
+   - **Any diff review that ALSO has focus/instructions → `codex exec`, NOT `codex review`.** ⚠️ `codex review` selector flags (`--uncommitted`/`--base`/`--commit`) **conflict with the `[PROMPT]` arg** in codex-cli 0.132.0+ (`error: the argument '--uncommitted' cannot be used with '[PROMPT]'`). Build the diff into the exec prompt instead: `codex exec "Run \`git --no-pager diff\` and review it. Focus on <X>. ..." < /dev/null`. (Base branch → `git --no-pager diff main...HEAD`; a commit → `git --no-pager show <sha>`.)
    - Anything else → `codex exec "<prompt>"`.
    - `ask "<question>"` or user phrase implying a question → `codex exec "<question>"`.
    - **Every `codex exec` invocation MUST end with `< /dev/null`** — otherwise it hangs on stdin. Non-negotiable.
@@ -157,6 +177,7 @@ Only override on explicit user request:
 | Review returns generic findings, no file:line citations | Codex didn't actually read the files it was asked about | Rerun with an explicit "prove-you-read-them-first" prompt |
 | Process times out mid-audit | Large cross-repo audit exceeded 5 min | Re-invoke with `timeout: 600000` and `run_in_background: true` |
 | `codex review --uncommitted` shows no diff | Working tree is clean OR changes are staged in a state Codex doesn't consider "uncommitted" | `git status`; use `--base <branch>` or stage changes |
+| `error: the argument '--uncommitted' cannot be used with '[PROMPT]'` (also `--base` / `--commit`) | codex-cli 0.132.0+ makes the diff-selector flags mutually exclusive with a focus `[PROMPT]` | Drop the prompt (bare `codex review --uncommitted`), OR for a focused review use `codex exec "Run \`git --no-pager diff\` and review it. Focus on X..." < /dev/null` |
 | Codex asks clarifying questions in `exec` mode | Prompt was ambiguous; Codex stalled asking for confirmation | Prompt more directly: "Do this without asking for confirmation", "Apply immediately" |
 | `Exit code 1` with `"The '<model>' model is not supported when using Codex with a ChatGPT account"` | Passed `-m <model>` that isn't allowed on ChatGPT-account Codex (e.g. `gpt-5-codex`) | Drop the `-m` flag (use the default) or pass `-m gpt-5.5`. |
 
@@ -166,5 +187,5 @@ Only override on explicit user request:
 - `/codex-review --base main` — Review all changes vs main.
 - `/codex-review --commit HEAD~2` — Review a specific commit.
 - `/codex-review ask "Is there a race condition in appointment-update.ts?"` — Ask a question.
-- `/codex-review "Focus on HIPAA compliance"` — Review with custom focus.
+- `/codex-review "Focus on HIPAA compliance"` — Review with custom focus → runs `codex exec "Run \`git --no-pager diff\` and review it. Focus on HIPAA compliance..." < /dev/null` (NOT `codex review --uncommitted "..."`, which errors in 0.132.0+).
 - `/codex-review ask "Compare the spec at /a/b/poc/specs/foo.md against the C++ driver at /a/b/legacy/drivers/foo.cpp. Start by running wc -l on each. List every divergence with file:line."` — Cross-repo spec audit. No extra flags needed — Codex reads both absolute paths.
