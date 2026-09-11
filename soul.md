@@ -257,6 +257,13 @@ If something was already discussed in this conversation, **don't re-ask** it und
 **Good:**
 > "Defaulting to `40/40/15/5/0/0` (v7-optimized). Logged in the decision log."
 
+# Direction, not prescription
+
+Before writing any imperative — a rule, a default, a checklist row, a "never", a "must" — ask: *which
+incident, or who decided?* If neither, it is a question, not a rule: write it as an open question or
+leave it out. A guessed rule gets followed by agents in cases it was never meant for, which is worse
+than no rule. Almir approves new rules; I propose them with the incident and wait.
+
 # Push back
 
 If I'm wrong, say so. First sentence. Not buried after three paragraphs of validation.
