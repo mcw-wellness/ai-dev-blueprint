@@ -14,19 +14,19 @@ Use the locally installed Google Gemini CLI (`/opt/homebrew/bin/gemini`, v0.27+)
 
 ## Defaults
 
-- **Model:** `pro` (alias → currently resolves to `gemini-3.1-pro-preview` with preview features; may resolve to `gemini-3-pro-preview` or `gemini-2.5-pro` depending on availability). Always prefer the alias `pro` over an explicit ID so you auto-upgrade as Google promotes new models. Known specific IDs (hints, not defaults): `gemini-3.1-pro-preview`, `gemini-3-pro-preview`, `gemini-3-flash-preview`, `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash`.
+- **Model:** `gemini-pro-latest` — Google's moving alias for the current Pro, so the CLI never goes stale. (2026-09-23: the CLI's own `pro` alias still resolved to `gemini-2.5-pro`, which the API now refuses as "no longer available to new users"; that read as a daily quota in two review runs.) `gemini-flash-latest` is the cheap equivalent. Pin an explicit ID only when reproducibility matters more than currency.
 - **Mode:** non-interactive (`-p`).
-- **Approval:** `--approval-mode yolo` — user's preference.
+- **Approval:** `--approval-mode plan` — a reviewer reads and answers; it must not write. (2026-09-22: under `yolo` a review run edited a branch and committed as the user.) Use `yolo` only when the task is explicitly to make changes.
 - **Timeout:** 5 min (`timeout: 300000`).
 
 Canonical invocation:
 ```bash
-GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode yolo -m pro -p "<prompt>"
+GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode plan -m gemini-pro-latest -p "<prompt>"
 ```
 
 With stdin:
 ```bash
-<source> | GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode yolo -m pro -p "<prompt>"
+<source> | GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode plan -m gemini-pro-latest -p "<prompt>"
 ```
 
 ## Subcommands
@@ -36,7 +36,7 @@ With stdin:
 Gemini Pro grounds answers in Google Search when the prompt asks for current info.
 
 ```bash
-GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode yolo -m pro -p "Search the web and answer with cited sources: <query>"
+GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode plan -m gemini-pro-latest -p "Search the web and answer with cited sources: <query>"
 ```
 
 **Examples:**
@@ -122,7 +122,7 @@ Markdown. Use headers, lists, and code blocks as you see fit. Structure is yours
 
 *Review a single file:*
 ```bash
-cat path/to/file.py | gemini --approval-mode yolo -m pro -p "$(cat <<'EOF'
+cat path/to/file.py | gemini --approval-mode plan -m gemini-pro-latest -p "$(cat <<'EOF'
 # Content Analysis Task
 ## Content Type
 code
@@ -142,7 +142,7 @@ EOF
 
 *Review uncommitted diff:*
 ```bash
-git diff HEAD | gemini --approval-mode yolo -m pro -p "<same template, Content Type = code, omit Programming Language (diff may span languages)>"
+git diff HEAD | gemini --approval-mode plan -m gemini-pro-latest -p "<same template, Content Type = code, omit Programming Language (diff may span languages)>"
 ```
 
 *Review changes vs base branch:*
@@ -157,7 +157,7 @@ git show <sha> | gemini ... -p "<template>"
 
 **For remote PRs** — delegate to the installed `code-reviewer` agent skill (Google's official). Just ask naturally and let Gemini's skill discovery activate it:
 ```bash
-gemini --approval-mode yolo -m pro -p "Review PR #<number> in this repo using the code-reviewer skill."
+gemini --approval-mode plan -m gemini-pro-latest -p "Review PR #<number> in this repo using the code-reviewer skill."
 ```
 It'll run `gh pr checkout`, preflight, read PR context, and return a structured review.
 
@@ -294,7 +294,7 @@ End with a short recommendation of your top pick and why.
 
 *Bare brainstorm (no project context):*
 ```bash
-gemini --approval-mode yolo -m pro -p "<template with Topic=<x>, no Project Background>"
+gemini --approval-mode plan -m gemini-pro-latest -p "<template with Topic=<x>, no Project Background>"
 ```
 
 *Project-aware brainstorm:*
@@ -315,7 +315,7 @@ Example user invocation:
 ### 5. `ask` — General Q&A
 
 ```bash
-gemini --approval-mode yolo -m pro -p "<question>"
+gemini --approval-mode plan -m gemini-pro-latest -p "<question>"
 ```
 
 ---
@@ -323,7 +323,7 @@ gemini --approval-mode yolo -m pro -p "<question>"
 ## Instructions for the agent running this skill
 
 1. **Parse args** to pick a subcommand. If ambiguous: lookup/current-info → `search`; open-ended/creative → `brainstorm`; diff/PR/commit/file review → `review` (default; use `review-principal` only if user says "rigorous", "strict", "principal", or asks for "bug hunt"); otherwise → `ask`.
-2. **Always** use `GEMINI_CLI_TRUST_WORKSPACE=true` as a prefix env var, `-m pro --approval-mode yolo -p`. Without the env var, Gemini refuses to run in non-interactive (headless) mode with exit code 55.
+2. **Always** use `GEMINI_CLI_TRUST_WORKSPACE=true` as a prefix env var, `-m gemini-pro-latest --approval-mode plan -p`. Without the env var, Gemini refuses to run in non-interactive (headless) mode with exit code 55.
 3. **Sandbox check — before running any Gemini command that references absolute file paths in the prompt**: scan those paths. If any path is outside the current working directory (and its descendants), append `--include-directories <path>` for each root that's outside. Example: a spec in `/a/b/poc-repo/...` referencing C++ in `/a/b/legacy-system/...` needs `--include-directories /a/b/legacy-system`. Failing to do this **silently degrades the review** — Gemini will fall back to web_fetch, 404, and produce findings based only on files it could actually read.
 4. For `review` AND `review-principal`:
    - Auto-detect content type + language from the file extension (use the tables above).
@@ -339,7 +339,7 @@ gemini --approval-mode yolo -m pro -p "<question>"
 6. Run with `timeout: 300000` (5 min).
 7. **Verify the output before presenting it as a successful review.** Scan the log tail for:
    - `Path not in workspace` → sandbox misconfigured. Re-run with `--include-directories`. Do NOT present partial findings as a completed review.
-   - `status: 429` / `RESOURCE_EXHAUSTED` → model capacity exhausted. Fall back: `-m pro` → `-m gemini-3-flash-preview` → `-m gemini-2.5-pro` → `-m gemini-2.5-flash`. Tell the user which model ran. (`gemini-3-flash-preview` = Gemini 3 Flash Preview, near-Pro quality, 1M context — prefer it over 2.5-tier when Pro is capacity-capped.)
+   - `status: 429` / `RESOURCE_EXHAUSTED` → model capacity exhausted. Fall back: `-m gemini-pro-latest` → `-m gemini-3-flash-preview` → `-m gemini-2.5-pro` → `-m gemini-2.5-flash`. Tell the user which model ran. (`gemini-3-flash-preview` = Gemini 3 Flash Preview, near-Pro quality, 1M context — prefer it over 2.5-tier when Pro is capacity-capped.)
    - `All fallback fetch attempts failed` → Gemini tried to grab files via web, failed. Same as sandbox issue — fix and re-run.
 8. Present the output to the user verbatim; summarize if very long. If you had to fall back to a lower model, say so.
 9. If `review` / `review-principal` finds actionable issues, offer to fix them (Claude applies the fix, not Gemini).
@@ -371,9 +371,9 @@ Error executing tool read_file: Path not in workspace: Attempted path "/…" res
 Add `--include-directories <path>` (repeatable, or comma-separated) for each extra directory Gemini should be allowed to read. Example for a cross-repo spec review where we compare a Python spec against C++ in a sibling repo:
 
 ```bash
-gemini --approval-mode yolo \
+gemini --approval-mode plan \
   --include-directories /Users/almir/Documents/GitHub/eventus/payments-service \
-  -m pro -p "<prompt that references both repos>"
+  -m gemini-pro-latest -p "<prompt that references both repos>"
 ```
 
 ### When to include extra directories
@@ -397,11 +397,11 @@ reason: MODEL_CAPACITY_EXHAUSTED
 
 The CLI auto-retries with backoff; after 10 failed attempts it errors out. Preview models (`gemini-3-pro-preview`, `gemini-3.1-pro-preview`) are especially prone to this.
 
-### Fallback chain when `-m pro` fails
+### Fallback chain when `-m gemini-pro-latest` fails
 
 **A 429 is NOT the end of the review — it means switch models.** Never report "Gemini unavailable" on a single 429; walk the chain first. This is mandatory **whether you invoked the skill or ran `gemini` directly via Bash** — running gemini raw does not exempt you from the fallback.
 
-1. First attempt: `-m pro` (preview if enabled, else 2.5-pro).
+1. First attempt: `-m gemini-pro-latest` (preview if enabled, else 2.5-pro).
 2. If 429 with `MODEL_CAPACITY_EXHAUSTED`: retry with `-m gemini-3-flash-preview` — Gemini 3 Flash, near-Pro quality, 1M context, usually has capacity when Pro doesn't. **This is the preferred fallback.**
 3. If that also 429s: `-m gemini-2.5-pro`.
 4. If that also 429s: `-m gemini-2.5-flash` — lowest quality but almost always available.
@@ -419,7 +419,7 @@ Both surface as tool failures in the log. Check the error message:
 ## Operational notes
 
 - **Free-tier rate limits**: 60 requests/min, 1000/day. CLI auto-retries with backoff. If you see "quota will reset after Xs", wait.
-- **YOLO quirk**: even with `--approval-mode yolo`, Gemini may still present a plan and ask "Does this plan look good?" before acting. When you want action not discussion, use forceful phrasing: *"Apply now"*, *"Start immediately"*, *"Do this without asking for confirmation"*.
+- **YOLO quirk**: even with `--approval-mode plan`, Gemini may still present a plan and ask "Does this plan look good?" before acting. When you want action not discussion, use forceful phrasing: *"Apply now"*, *"Start immediately"*, *"Do this without asking for confirmation"*.
 - **Always check the tail of the output** for `Path not in workspace`, `All fallback fetch attempts failed`, or `Attempt N failed with status 429` before presenting the result as a successful review. A silent review based on unreadable files is worse than no review.
 - **Remote PR review**: the official `code-reviewer` agent skill is installed at `~/.gemini/skills/code-reviewer/`. Gemini auto-activates it when the prompt mentions reviewing a PR number or URL. No manual invocation needed.
 
@@ -441,7 +441,7 @@ Both surface as tool failures in the log. Check the error message:
 When auditing a spec in repo A against source code in sibling repo B, the invocation MUST include `--include-directories` for B, or Gemini's file tools will fail silently and the review will be bogus.
 
 ```bash
-gemini --approval-mode yolo -m pro \
+gemini --approval-mode plan -m gemini-pro-latest \
   --include-directories /Users/almir/Documents/GitHub/eventus/payments-service \
   -p "<prompt referencing absolute paths in both repos>"
 ```
