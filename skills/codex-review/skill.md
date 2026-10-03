@@ -15,6 +15,9 @@ Use the locally installed OpenAI Codex CLI (`/opt/homebrew/bin/codex`) to get a 
 ## Defaults
 
 - **Binary:** `/opt/homebrew/bin/codex`.
+- **Model = "Astra":** the default model in `~/.codex/config.toml` is `gpt-6-astra`. When Almir says **"Astra"**
+  ("ask Astra", "brainstorm with Astra and Gemini") he means Codex running this model — invoke `codex exec` as usual,
+  no `-m` needed. Astra is the Codex seat in the Fable / Astra / Gemini trio.
 - **Non-interactive mode:** `codex exec "<prompt>"` or `codex review --uncommitted`.
 - **Always close stdin: `codex exec "<prompt>" < /dev/null`.** Without it, `codex exec` blocks waiting on stdin when there is no interactive TTY (background tasks, piped invocations, agent runs) — it prints `Reading additional input from stdin...` and hangs until the timeout kills it. This is the #1 cause of "Codex hung with no output". The prompt belongs in the argument; stdin must be empty.
 - **Reasoning effort:** the default comes from `~/.codex/config.toml` (`model_reasoning_effort`, currently `medium`). Override per-run with `-c model_reasoning_effort=high` for a tricky review, or `xhigh` for a genuinely hard bug hunt / deep audit. Leave it at `medium` for routine diff reviews — bumping effort costs latency and tokens for little gain on simple changes.
@@ -161,7 +164,7 @@ The `< /dev/null` is mandatory — see Defaults. The leading "run `wc -l`" instr
 
 Only override on explicit user request:
 
-- `-m <model>` — use a different model. **Default is fine for most work — prefer omitting the flag.** When using a ChatGPT account, `gpt-5-codex` is rejected (`"The 'gpt-5-codex' model is not supported when using Codex with a ChatGPT account."`); use the default (no `-m`) or pass `-m gpt-5.5`.
+- `-m <model>` — use a different model. **Default (`gpt-6-astra`, "Astra") is fine for most work — prefer omitting the flag.** When using a ChatGPT account, `gpt-5-codex` is rejected (`"The 'gpt-5-codex' model is not supported when using Codex with a ChatGPT account."`); use the default (no `-m`) or pass `-m gpt-5.5`.
 - `-s read-only` — explicit read-only (belt and suspenders; this is also the default).
 - `-s workspace-write` — needed if Codex should be allowed to write files in the workspace. Implies read access remains full.
 - `-s danger-full-access` — full read+write+exec. Avoid unless the user is asking for an autonomous edit session and accepts the risk.
