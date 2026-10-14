@@ -23,6 +23,7 @@ Restart Claude Code and the skills will be callable as `/gemini`, `/codex-review
 - **`gemini/`** — Run Google Gemini CLI (`/gemini search|review|brainstorm|ask`). Default model: Gemini 3 Pro. Project-context aware.
 - **`codex-review/`** — Run OpenAI Codex CLI for second-opinion code review (`/codex-review ask "question"` or `/codex-review review`).
 - **`cursor/`** — Run the Cursor Agent CLI (`/cursor review|brainstorm|ask`) on your paid subscription, using Cursor's own Composer 2.5 model. The third independent reviewer alongside Gemini and Codex. Includes Tailscale-MagicDNS troubleshooting (the usual cause of `cursor-agent` connection failures).
+- **`ai-usage/`** — Remaining Claude Code / Codex quota for every local profile: % used per limit, reset times, logged-in account, login expiry. Read-only. Also handy as a terminal command: `ln -s "$(pwd)/ai-usage/ai-usage.py" ~/.local/bin/ai-usage`.
 - **`chrome-troubleshooting/`** — Fix "No Chrome extension connected" for `mcp__claude-in-chrome__*` tools (conflict between Claude Desktop and Claude Code native messaging hosts). Rare but painful when it hits.
 
 ## Usage in the review flow
