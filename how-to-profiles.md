@@ -29,7 +29,10 @@ profile reuses its human's colour.
 | almir | `claude-almir` | `~/.claude-almir/` | Personal | Graphite `#202028` `{8224,8224,10280}` |
 | (default) | `claude` | `~/.claude/` | Default | terminal default |
 
-Every named Claude launcher runs: `claude --dangerously-skip-permissions --verbose`.
+Every named Claude launcher runs: `caffeinate -i claude --dangerously-skip-permissions --verbose`.
+`caffeinate -i` holds the Mac awake (screen may sleep, Wi-Fi stays up) for as long as the session
+is open; Claude Code's own caffeinate only covers active turns, so idle sessions slept on battery.
+Lid close still sleeps.
 
 ### Codex — 2 named instances + default
 
@@ -65,7 +68,7 @@ mk-launcher() {
     echo "# ${tool} - ${name} instance"
     echo "osascript -e 'tell application \"Terminal\" to set background color of selected tab of front window to {${r}, ${g}, ${b}}' 2>/dev/null"
     if [ "$tool" = claude ]; then
-      echo "CLAUDE_CONFIG_DIR=\"\$HOME/.claude-${name}\" CLAUDE_INSTANCE=\"${name}\" exec claude --dangerously-skip-permissions --verbose \"\$@\""
+      echo "CLAUDE_CONFIG_DIR=\"\$HOME/.claude-${name}\" CLAUDE_INSTANCE=\"${name}\" exec caffeinate -i claude --dangerously-skip-permissions --verbose \"\$@\""
     else
       echo "CODEX_HOME=\"\$HOME/.codex-${name}\" exec codex --yolo \"\$@\""
     fi
