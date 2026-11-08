@@ -3,7 +3,10 @@
 ## Status
 IN_PROGRESS | COMPLETE | INCONCLUSIVE
 
-## Hypothesis
+## Direction
+Where Almir wants to lead this experiment, in his words.
+
+## Hypothesis (optional)
 What we're trying to prove/disprove. Be specific.
 
 ## Why

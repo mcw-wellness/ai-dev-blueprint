@@ -1,5 +1,8 @@
 # How to run experiments
 
+**Standing direction (Almir, 2026-11-08):** minimise Almir's time, with minimal or no risk to the
+result. The agent does the directional research and finds the best option itself.
+
 **TDD does not apply to experiments.** Experiments are exploratory — you don't know the answer yet, so you can't write tests first.
 
 ## When to experiment vs develop
@@ -11,13 +14,18 @@
 
 ## Scientific method (mandatory)
 
-1. **Hypothesis** — What are you trying to prove/disprove? Be specific.
+1. **Direction** — Where Almir wants to lead the experiment, in his words. A hypothesis is optional.
 2. **Setup** — Exact commands, versions, parameters, hardware.
 3. **Procedure** — Step-by-step plan. One variable at a time.
 4. **Execute** — Run it. Record ALL output (success AND failure).
 5. **Analyze** — Root cause, not just "it didn't work."
 6. **Document** — Update audit log immediately. Commit raw logs as evidence.
 7. **Extract** — If a durable observation was found, extract it as a **finding** (see [spec-anchored.md](spec-anchored.md)).
+
+## Gold set
+
+When creating an experiment, the agent suggests a gold set (a fixed yardstick that every run is
+scored against). The agent builds it; Almir never builds it by hand.
 
 ## Key rules
 
@@ -30,7 +38,7 @@
   attribution. (Ruled by Almir 2026-08-25.)
 - **Document failures** — they're MORE valuable than successes.
 - **Audit log is living** — update `audit-log.md` immediately after each attempt, not at the end of the session. A log reconstructed from memory is fiction, not evidence.
-- **Findings: append when relevant.** Add to `findings.md` when an observation is relevant to the hypothesis (supports, contradicts, or qualifies it) or opens a new hypothesis worth investigating. No threshold, no approval gate — just cite the audit attempt + log that backs it. Revisable: amend in place with a dated note if new evidence changes the picture.
+- **Findings: append when relevant.** Add to `findings.md` when an observation is relevant to the direction or the hypothesis (supports, contradicts, or qualifies it) or opens a new one worth investigating. No threshold, no approval gate — just cite the audit attempt + log that backs it. Revisable: amend in place with a dated note if new evidence changes the picture.
 - **Findings are not specs** — experiments produce findings about things you don't control. Specs describe what you build.
 
 ## Reviews
