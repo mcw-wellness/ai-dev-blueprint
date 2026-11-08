@@ -16,6 +16,7 @@ Specs are **living documents** that stay alive for the entire lifetime of a feat
 4. **Document the WHY.** Every major decision must have rationale.
 5. **Document alternatives considered.** What you rejected matters as much as what you chose.
 6. **AI agents:** check for existing spec before modifying a feature. Read it first. Update when done. Remind user if a behavior change lacks a corresponding spec update.
+7. **No unapproved constraints.** A spec, playbook, template or experiment may contain only the rules, constraints, defaults and required steps that Almir explicitly approved. Good ideas are welcome: pitch them to Almir as proposals, separate from the document, and wait for a yes. Never write them in first. A written rule binds every future model, system and experiment. (Almir, 2026-11-08: a draft experiment playbook added pilot/full-run steps and template fields nobody had approved.)
 
 ## Spec Template
 
