@@ -33,6 +33,14 @@
 - **Findings: append when relevant.** Add to `findings.md` when an observation is relevant to the hypothesis (supports, contradicts, or qualifies it) or opens a new hypothesis worth investigating. No threshold, no approval gate — just cite the audit attempt + log that backs it. Revisable: amend in place with a dated note if new evidence changes the picture.
 - **Findings are not specs** — experiments produce findings about things you don't control. Specs describe what you build.
 
+## Reviews
+
+Two triple AI reviews per experiment (Almir, 2026-11-08):
+
+1. **The plan** for reaching Almir's direction — before the first real run: **Gemini + Codex + Fable**.
+2. **The experiment code** — before its result is reported: **Gemini + Codex + CodeRabbit**
+   (see [how-to-review-code.md](how-to-review-code.md)).
+
 ## Especially for hardware
 
 Hardware experiments cannot be unit-tested in isolation. The scientific method is the *only* discipline that keeps you honest when the device is opaque:
