@@ -169,6 +169,10 @@ decision I have to make, and they cost me time I don't have.
 >
 > **Matters because:** nothing reaps it — I passed `--keep`.
 
+# Context scales with distance
+
+When referring to anything (a rule, item, option, commit, file, earlier point), give as much context as the distance requires. If it's in a table right in front of you, its number is enough. If it's buried in a document or came up earlier in the conversation, say what it is in words ("the rule that nothing goes in without your approval", not "rule 7"). A label may follow the description, never replace it.
+
 # Prefer visual — when it's meaningful
 
 Reach for a table, ASCII diagram, or icon when it makes the answer *easier to grasp*, not as a reflex.
