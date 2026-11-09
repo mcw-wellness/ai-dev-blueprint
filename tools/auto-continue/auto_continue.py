@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, NamedTuple
@@ -20,6 +21,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 DELAYS_MIN = [5, 10, 15, 30, 30, 60, 60]  # wait before retry 1, 2, … ; hourly after that
 HOURLY = timedelta(minutes=60)
 WINDOW = timedelta(hours=12)
+SWITCH_PAUSE_S = 3
 AFTER_RESET = timedelta(minutes=2)
 STATE_DIR = Path.home() / ".local" / "state" / "auto-continue"
 
@@ -70,11 +72,13 @@ def parse_reset(text, error_at):
 
 
 def classify(entry):
-    """→ ('retry', None) | ('reset', at) | ('quota', None) | ('notify', None)"""
+    """→ ('retry', None) | ('reset', at) | ('fable', None) | ('quota', None) | ('notify', None)"""
     error = entry.get("error")
     if error == "server_error":
         return "retry", None
     if error == "rate_limit":
+        if "your Fable limit" in text_of(entry):
+            return "fable", None     # a per-model limit: the same account still has Opus
         at = parse_reset(text_of(entry), ts(entry))
         if at and at - ts(entry) <= WINDOW:
             return "reset", at
@@ -88,7 +92,7 @@ def is_error(entry):
 
 def decide(entry, state, now):
     """One session, one tick. Returns (new_state, actions). Actions: send, notify:hourly,
-    notify:giveup, notify:error, quota. State is JSON-able (ISO strings)."""
+    notify:giveup, notify:error, quota, switch:opus. State is JSON-able (ISO strings)."""
     if not is_error(entry):
         if entry and entry.get("type") == "assistant":
             return None, []          # a real reply: the session recovered
@@ -106,6 +110,8 @@ def decide(entry, state, now):
             return state, []
         if kind == "quota":
             return dict(state, done=True), ["quota"]
+        if kind == "fable":
+            return dict(state, done=True), ["switch:opus"]
         if kind == "notify":
             return dict(state, done=True), ["notify:error"]
     if state.get("done"):
@@ -296,6 +302,15 @@ def run_action(action, fx, s, profile, label, transcript):
         if not (tty and fx.send(tty, "continue")):
             fx.notify("auto-continue: could not type into Terminal",
                       f"{label}: no Terminal tab on {tty or 'any tty'}, or no Automation permission")
+    elif action == "switch:opus":
+        tty = fx.tty_of(s["pid"])
+        if not (tty and fx.send(tty, "/model opus")):
+            fx.notify("auto-continue: could not type into Terminal",
+                      f"{label}: no Terminal tab on {tty or 'any tty'}, or no Automation permission")
+            return
+        time.sleep(SWITCH_PAUSE_S)   # let the model switch land before the next line
+        fx.send(tty, "continue")
+        fx.notify("auto-continue: switched to Opus", f"{label}: Fable limit reached, continuing on Opus")
     elif action == "notify:hourly":
         fx.notify("auto-continue: still failing after 3.5 h",
                   f"{label}: retrying hourly for up to 12 h. {error}")

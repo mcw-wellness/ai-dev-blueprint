@@ -114,6 +114,13 @@ class OtherErrorsTest(unittest.TestCase):
         state, second = ac.decide(entry, state, T0 + minutes(2))
         self.assertEqual((first, second), (["quota"], []))
 
+    def test_fable_limit_switches_to_opus_once(self):
+        entry = error_entry("You've reached your Fable limit. Run /usage-credits to continue or switch "
+                            "models with /model.", "rate_limit")
+        state, first = ac.decide(entry, None, T0 + minutes(1))
+        state, second = ac.decide(entry, state, T0 + minutes(2))
+        self.assertEqual((first, second), (["switch:opus"], []))
+
     def test_expired_login_notifies_once_and_never_types(self):
         entry = error_entry("Login expired · Please run /login", "authentication_failed")
         state, first = ac.decide(entry, None, T0 + minutes(1))
@@ -242,6 +249,14 @@ class TickTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.tick(T0 + minutes(5))
         self.assertEqual(len(json.loads(self.state_path.read_text())), 1)
+
+    def test_fable_limit_types_model_opus_then_continue_and_notifies(self):
+        fable = error_entry("You've reached your Fable limit. Run /usage-credits to continue or "
+                            "switch models with /model.", "rate_limit")
+        self.add_session(4242, "s1", [user_entry(), fable])
+        self.tick(T0 + minutes(1))
+        self.assertEqual(self.sent, [("/dev/ttys042", "/model opus"), ("/dev/ttys042", "continue")])
+        self.assertEqual(self.notes, ["auto-continue: switched to Opus"])
 
     def test_a_tab_that_cannot_be_typed_into_is_reported(self):
         self.effects = self.effects._replace(send=lambda tty, text: False)

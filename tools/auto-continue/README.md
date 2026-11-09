@@ -15,7 +15,8 @@ transcript is an API error (`isApiErrorMessage: true`), it acts by the entry's `
 |---|---|---|
 | `server_error` | sleep mid-response, ENOTFOUND, ECONNRESET, connection lost | Type `continue` into the session's Terminal tab, with backoff |
 | `rate_limit` with a reset ≤ 12 h away | "session limit · resets 8:40am (Europe/Vienna)" | One `continue` at reset + 2 min |
-| `rate_limit` without a reset, or reset > 12 h away | out of credits, Fable limit, weekly limit | Notify + write other profiles' quota to `quota.txt`; copy a `resume-in` command to the clipboard. **Never switches account on its own** |
+| `rate_limit` "your Fable limit" | a per-model limit; the account still has Opus | Types `/model opus`, then `continue`, once; notifies "switched to Opus" |
+| `rate_limit` without a reset, or reset > 12 h away | out of credits, weekly limit | Notify + write other profiles' quota to `quota.txt`; copy a `resume-in` command to the clipboard. **Never switches account on its own** |
 | `authentication_failed`, anything else | login expired | Notify once |
 
 **Backoff** (minutes after the error): +5, +10, +15, +30, +30, +60, +60 (~3.5 h), then hourly until
