@@ -366,12 +366,20 @@ def draw(
 
 
 def main() -> None:
-    out, columns, dark = Path(sys.argv[1]), int(sys.argv[2]), sys.argv[3:] == ["dark"]
+    out, columns = Path(sys.argv[1]), int(sys.argv[2])
+    dark, solid = "dark" in sys.argv[3:], "solid" in sys.argv[3:]
     source = sys.stdin.read()
     try:
         cols, rows, said = draw(source, columns, out, dark)
     except Refused as e:
         sys.exit(str(e))
+    if solid:
+        # For Quick Look / Preview (Terminal.app, Almir 2026-11-08): the page is transparent, which a dark viewer
+        # shows dark on dark, so the light palette goes onto the page's own light colour.
+        with Image.open(out) as drawn:
+            page_bg = Image.new("RGBA", drawn.size, BG)
+            page_bg.alpha_composite(drawn.convert("RGBA"))
+        page_bg.convert("RGB").save(out)
     print(
         json.dumps(
             {

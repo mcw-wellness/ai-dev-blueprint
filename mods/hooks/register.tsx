@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import { drawer, readPalette } from './transcript/chart'
+import { drawer, readPalette, viewers } from './transcript/chart'
 import { render } from './transcript/message'
 import { reply } from './reply/band'
 import { ghost, replyAnswer, replyStart, replySubmit } from './reply/state'
@@ -43,6 +43,7 @@ export const register: Register = on => {
   reply(on)
   tools(on)
   hint(on)
+  viewers(on)
 
   on('session.start', async ($, e, next) => {
     const result = await next(e)

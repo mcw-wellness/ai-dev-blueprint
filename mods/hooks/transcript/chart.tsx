@@ -2,7 +2,7 @@
 // (charts/mermaid.py), for message.tsx's reply hook. A drawing never waits on the process: a fence
 // not drawn yet shows as the engine draws it, the picture replacing it once mermaid.py wrote it.
 
-import type { Elements, EngineInterface, RenderElement } from 'claude-code'
+import type { Elements, EngineInterface, On, RenderElement } from 'claude-code'
 
 import type { Chart } from './blocks'
 
@@ -26,6 +26,14 @@ type Drawn = { file: string; columns: number; rows: number; alt: string; generat
 type Palette = 'light' | 'dark'
 let palette: Palette = 'light'
 
+/**
+ * Terminal.app draws no pictures (no kitty graphics): there a chart is a row whose hover opens it in Quick Look and
+ * whose click opens it in Preview (Almir, 2026-11-08), drawn light on a solid page into a cache that outlives the
+ * session. Set at session start from TERM_PROGRAM.
+ */
+let viewer = false
+const VIEWER_DIR = 'Library/Caches/agent-tooling/diagrams'
+
 export async function readPalette($: EngineInterface): Promise<void> {
   // An engine with no /config rows (a test's) leaves it light.
   const rows = await $.config.list().catch(() => [])
@@ -44,9 +52,13 @@ let made = 0 // pictures drawn, naming each file
 /** The fence drawn by mermaid.py into this session's temporary folder, or why not. */
 async function attempt($: EngineInterface, body: string, columns: number, colors: Palette): Promise<Exclude<Drawn, 'pending'>> {
   const tmp = ((await $.env.get('TMPDIR')) ?? '/tmp').replace(/\/$/, '')
-  const file = `${tmp}/agent-tooling-${await $.session.id()}/reply/${made++}-${columns}.png`
+  const home = (await $.env.get('HOME')) ?? ''
+  const file = viewer
+    ? `${home}/${VIEWER_DIR}/${await $.session.id()}/${made++}-${columns}.png`
+    : `${tmp}/agent-tooling-${await $.session.id()}/reply/${made++}-${columns}.png`
+  const style = viewer ? ['light', 'solid'] : [colors]
   try {
-    const ran = await $.process.run(['uv', 'run', '--quiet', `${$.plugin.root}/${SCRIPT}`, file, String(columns), colors], {
+    const ran = await $.process.run(['uv', 'run', '--quiet', `${$.plugin.root}/${SCRIPT}`, file, String(columns), ...style], {
       timeoutMs: 60_000,
       stdin: body,
     })
@@ -78,6 +90,7 @@ const asked: { key: string; body: string; columns: number; colors: Palette; done
  * millisecond, so it ticks at a pace that adds little to a drawing's seconds.
  */
 export async function drawer($: EngineInterface): Promise<void> {
+  viewer = (await $.env.get('TERM_PROGRAM')) === 'Apple_Terminal'
   $.clock.every(DRAIN_MS, () => drain($))
   await readPalette($) // before a reply draws, so none draws in the wrong palette
 }
@@ -114,7 +127,7 @@ export async function ready(p: Chart, columns: number): Promise<void> {
  * so a long transcript never starts a process per chart above the screen.
  */
 export function chart(el: Elements['terminal'], p: Chart, columns: number, onScreen: unknown): RenderElement {
-  const { Box, Markdown, Text, Image } = el
+  const { Box, Markdown, Text, Image, Client } = el
   const d = drawn.get(keyOf(p, columns))
   if (d === undefined && onScreen !== null) void start(p, columns)
   if (d === undefined || d === 'pending' || 'error' in d) {
@@ -125,6 +138,34 @@ export function chart(el: Elements['terminal'], p: Chart, columns: number, onScr
       </Box>
     )
   }
+  if (viewer) return <Client key={`diagram:${d.file}`} module="./diagram-client.tsx" props={{ file: d.file, alt: d.alt }} />
   const source = { file: d.file, format: 'png', generation: d.generation } as const
   return <Image source={source} columns={d.columns} rows={d.rows} alt={d.alt} />
+}
+
+let peeked = { file: '', at: 0 }
+
+/** What a diagram row posts: Quick Look on hover, Preview on click, for a picture of our own cache only. */
+export function viewers(on: On): void {
+  on('ui.message', async ($, e, next) => {
+    const data = e.data as { act?: unknown; file?: unknown } | null
+    const home = (await $.env.get('HOME')) ?? ''
+    const file = typeof data?.file === 'string' ? data.file : ''
+    if (!file.startsWith(`${home}/${VIEWER_DIR}/`) || !file.endsWith('.png') || file.includes('..')) return next(e)
+    if (data?.act === 'open') {
+      const ran = await $.process.run(['open', '-a', 'Preview', file]).catch((x: unknown) => ({ exitCode: 1, stderr: String(x) }))
+      if (ran.exitCode !== 0) $.ui.toast(`Preview did not open: ${ran.stderr.trim()}`)
+      return {}
+    }
+    if (data?.act === 'peek') {
+      const now = await $.clock.now()
+      // Quick Look takes the focus, and coming back the pointer enters the row again: one peek per file per 3 s.
+      if (peeked.file === file && now - peeked.at < 3_000) return {}
+      peeked = { file, at: now }
+      // One Quick Look at a time; detached, since it stays open until closed.
+      await $.process.run(['/bin/sh', '-c', 'pkill -f "qlmanage -p" ; qlmanage -p "$1" >/dev/null 2>&1 &', 'sh', file])
+      return {}
+    }
+    return next(e)
+  }).catch(($, e, next) => next(e))
 }
