@@ -201,7 +201,11 @@ def terminal_send(tty, text):
   repeat with w in windows
     repeat with t in tabs of w
       if tty of t is "{tty}" then
+        -- Claude Code reads a burst of typed text as a paste, where Return is a line break, not
+        -- a send (2026-11-08, fullscreen + agent-tooling). So the text first, then Return alone.
         do script "{text}" in t
+        delay 0.5
+        do script "" in t
         return "sent"
       end if
     end repeat
