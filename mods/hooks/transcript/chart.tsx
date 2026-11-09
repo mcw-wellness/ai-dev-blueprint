@@ -144,6 +144,7 @@ export function chart(el: Elements['terminal'], p: Chart, columns: number, onScr
 }
 
 let peeked = { file: '', at: 0 }
+const RAISE_QL = 'ObjC.import("AppKit"); var a = $.NSRunningApplication.runningApplicationsWithBundleIdentifier("com.apple.quicklook.qlmanage"); if (a.count) a.objectAtIndex(0).activateWithOptions(3)'
 
 /** What a diagram row posts: Quick Look on hover, Preview on click, for a picture of our own cache only. */
 export function viewers(on: On): void {
@@ -162,8 +163,9 @@ export function viewers(on: On): void {
       // Quick Look takes the focus, and coming back the pointer enters the row again: one peek per file per 3 s.
       if (peeked.file === file && now - peeked.at < 3_000) return {}
       peeked = { file, at: now }
-      // One Quick Look at a time; detached, since it stays open until closed.
-      await $.process.run(['/bin/sh', '-c', 'pkill -x qlmanage ; qlmanage -p "$1" >/dev/null 2>&1 &', 'sh', file])
+      // One Quick Look at a time; detached, since it stays open until closed. Started from a script it
+      // can open behind Terminal, so once its window is up it is raised through AppKit (no permission dialog).
+      await $.process.run(['/bin/sh', '-c', `pkill -x qlmanage ; qlmanage -p "$1" >/dev/null 2>&1 & ( sleep 0.6 ; osascript -l JavaScript -e '${RAISE_QL}' >/dev/null 2>&1 ) &`, 'sh', file])
       return {}
     }
     return next(e)
