@@ -163,7 +163,7 @@ export function viewers(on: On): void {
       if (peeked.file === file && now - peeked.at < 3_000) return {}
       peeked = { file, at: now }
       // One Quick Look at a time; detached, since it stays open until closed.
-      await $.process.run(['/bin/sh', '-c', 'pkill -f "qlmanage -p" ; qlmanage -p "$1" >/dev/null 2>&1 &', 'sh', file])
+      await $.process.run(['/bin/sh', '-c', 'pkill -x qlmanage ; qlmanage -p "$1" >/dev/null 2>&1 &', 'sh', file])
       return {}
     }
     return next(e)
