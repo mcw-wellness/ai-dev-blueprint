@@ -14,10 +14,12 @@ const DiagramRow: ClientModule<Props, boolean> = (props, surface) => {
     })
   }
   return (
-    <Box>
-      <Text color="suggestion" bold>{'◇ diagram '}</Text>
-      <Text>{props.alt}</Text>
-      <Text dimColor>{'  · hover: Quick Look · click: Preview'}</Text>
+    <Box flexDirection="column">
+      <Text>
+        <Text color="suggestion" bold>{'◇ diagram'}</Text>
+        <Text dimColor>{'  hover: Quick Look · click: Preview'}</Text>
+      </Text>
+      <Text dimColor>{props.alt}</Text>
     </Box>
   )
 }
