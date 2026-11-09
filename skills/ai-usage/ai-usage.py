@@ -81,6 +81,45 @@ def claude_profiles():
     return dirs
 
 
+def keychain_oauth(d: Path):
+    """The profile's OAuth record from the Keychain, or None when it has no login."""
+    default = d == HOME / ".claude"
+    service = "Claude Code-credentials" if default else \
+        "Claude Code-credentials-" + hashlib.sha256(str(d).encode()).hexdigest()[:8]
+    r = subprocess.run(["security", "find-generic-password", "-s", service, "-w"],
+                       capture_output=True, text=True)
+    return json.loads(r.stdout)["claudeAiOauth"] if r.returncode == 0 else None
+
+
+def claude_usage(o: dict) -> dict:
+    return http_json("https://api.anthropic.com/api/oauth/usage",
+                     {"Authorization": f"Bearer {o['accessToken']}", "anthropic-beta": "oauth-2025-04-20"})
+
+
+def weekly_percent(d: Path):
+    """% of the account-wide weekly limit used, or None when the profile can't be read right now
+    (no login, or an access token that only the CLI itself may refresh)."""
+    o = keychain_oauth(d)
+    if not o or not o.get("expiresAt") or o["expiresAt"] / 1000 < time.time():
+        return None
+    for lim in claude_usage(o).get("limits") or []:
+        if lim.get("kind") == "weekly_all":
+            return lim["percent"]
+    return None
+
+
+def weekly_line(readings) -> str:
+    """[(profile, percent | None)] → 'wk: vvs 42% · tcp 88% ⚠️ · almir ?'. Profiles without a login are
+    left out by the caller; None means logged in but unreadable now."""
+    parts = []
+    for name, pct in readings:
+        if pct is None:
+            parts.append(f"{name} ?")
+        else:
+            parts.append(f"{name} {pct:.0f}%" + (" ⚠️" if pct >= 80 else ""))
+    return "wk: " + " · ".join(parts) if parts else ""
+
+
 def claude_report(d: Path) -> list[str]:
     default = d == HOME / ".claude"
     service = "Claude Code-credentials" if default else \
@@ -107,8 +146,7 @@ def claude_report(d: Path) -> list[str]:
                    f"run claude in this profile once, then re-run{RST}")
         return out
 
-    u = http_json("https://api.anthropic.com/api/oauth/usage",
-                  {"Authorization": f"Bearer {o['accessToken']}", "anthropic-beta": "oauth-2025-04-20"})
+    u = claude_usage(o)
     for lim in u.get("limits") or []:
         model = ((lim.get("scope") or {}).get("model") or {}).get("display_name")
         label = {"session": "session (5h)", "weekly_all": "weekly (all)"}.get(lim["kind"], lim["kind"])
@@ -183,7 +221,21 @@ def run(fn, d):
         return None, f"{type(e).__name__}: {e}"
 
 
+def profile_name(d: Path) -> str:
+    return d.name.split("-", 1)[1] if "-" in d.name else "default"
+
+
+def main_weekly():
+    """One line for the status line: each logged-in Claude profile's weekly %."""
+    dirs = [d for d in claude_profiles() if (keychain_oauth(d) or {}).get("expiresAt")]  # logged in at all
+    with ThreadPoolExecutor(max(1, len(dirs))) as ex:
+        pcts = list(ex.map(weekly_percent, dirs))
+    print(weekly_line([(profile_name(d), p) for d, p in zip(dirs, pcts)]))
+
+
 def main():
+    if sys.argv[1:] == ["--weekly-line"]:
+        return main_weekly()
     jobs = [("CLAUDE", d, claude_report) for d in claude_profiles()] + \
            [("CODEX", d, codex_report) for d in codex_profiles()]
     with ThreadPoolExecutor(len(jobs)) as ex:
@@ -195,7 +247,7 @@ def main():
         if prod != section:
             section = prod
             print(f"\n{BOLD}{prod}{RST}")
-        name = d.name.split("-", 1)[1] if "-" in d.name else "default"
+        name = profile_name(d)
         print(f"  {BOLD}{name:<9}{RST}", end="")
         if err:
             failed = True
