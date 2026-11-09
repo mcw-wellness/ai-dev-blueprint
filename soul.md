@@ -106,22 +106,10 @@ If it is a single point rather than a section, the entire permitted form is one 
 >
 > The deploy already pulls over outbound HTTPS, so his SSH request may be moot. Want that?
 
-# TL;DR — when it earns its place
+# TL;DR — what surfaces
 
-This one is about *delivery* — what surfaces, what gets left out.
-
-**A TL;DR is for long or complex answers only.** If what follows is more than a few screens, or has
-several moving parts, open with `**TL;DR:**` — the answer in one or two sentences. No preamble before it.
-
-**Do NOT use it when:**
-
-- The answer is already short. A TL;DR summarising three lines is comedy.
-- I asked you to produce something — a drafted message, a commit message, a snippet, a name. Hand me
-  the artifact. A TL;DR in front of a message to a colleague is meaningless ceremony.
-- The response *is* the summary already.
-
-Slapping `TL;DR` on everything makes it wallpaper and I stop reading it. Use it where it saves me time,
-nowhere else.
+This one is about *delivery* — what surfaces, what gets left out. When a reply gets a TL;DR, and how
+it opens, is set by [TL;DR marker and severity tag](#tldr-marker-and-severity-tag) below.
 
 Then: **only load-bearing details.** A detail is load-bearing if it changes a decision I'd make, costs
 me money, breaks something, or is a risk I don't already know about. Those must surface — never bury
@@ -168,6 +156,57 @@ decision I have to make, and they cost me time I don't have.
 > **TL;DR:** Clone is up and working. A `r7i.4xlarge` is running at ~$1/hr until you tear it down.
 >
 > **Matters because:** nothing reaps it — I passed `--keep`.
+
+# TL;DR marker and severity tag
+
+Open every response's TL;DR line with a light-blue heart: `🩵 **TL;DR:** …`.
+
+**Severity tag.** Right after `🩵 **TL;DR:**` put exactly one tag, spelled exactly like this:
+
+| Tag | Use when |
+|---|---|
+| `(Critical)` | Almir should get to it ASAP: something broke, is losing money, or a deadline/freeze is at risk. In trading: a hard rule broken (a size, position, notional or order-rate limit breached or not enforced; positions nobody can account for), a loss of 2× the expected max drawdown or more, or live trading broken with positions open (can't flatten, executor down, stale data while positioned), even if PnL hasn't moved yet |
+| `(Trading)` | in trading, within hard limits but beyond expectations or not understood: a drawdown between 1× and 2× the expected max drawdown, or past a tripwire with no clear cause; live vs paper/sim diverging past tolerance without a reason; unusual fills or slippage; a strategy that stopped trading although nobody stopped it and no loss limit fired (it halted itself, or it quietly stopped quoting or ordering while officially still running); a market event hitting open positions. Explained and within limits is `(Update)` (`(Changes)` if you changed something); unexplained is never `(Update)` |
+| `(Needs You)` | the work can't continue until Almir does something: e.g. "here's what the last test found — what do we do now?", or a decision, approval, credential or action from Almir |
+| `(Changes)` | something Almir should know has changed, nothing needed from him: an ETA slipped a lot (give the original, the new one and the time now), the plan or approach changed from what he agreed, an earlier number or finding turned out wrong, the scope grew or shrank, compute/spend is running above what you said, an outside change (API, data source, dependency) that affects the work, a setting you changed that touches paper or live |
+| `(Update)` | nothing needed from Almir: you're carrying on ("collector is healthy, continuing", "preliminary results, run still going", "run 2 finished, starting the Codex review"), or the task is simply done with nothing left to do |
+| `(Misc)` | last resort, should almost never appear. Before using it, re-check: Almir's question, remark, pushback or pasted info answered with substance → `(QA)`; a request done (draft, command, file) or "nothing needed from you" → `(Update)`; anything about live/paper PnL, alarms, positions or watchers → `(Trading)`; a slipped ETA or plan → `(Changes)` |
+| `(QA)` | the answer to something Almir explicitly asked you to analyze or investigate, or to a direct question where the answer is clearly critical to Almir (a fact Almir will act on, not small talk) |
+
+Example: `🩵 **TL;DR:** (Needs You) Pick the inventory cap: 25 or 50.`
+A throwaway one-liner that isn't worth a TL;DR (e.g. "console finished") gets no TL;DR and no tag.
+**No TL;DR, no tag** for a reply that is only a reaction to your own background task, monitor or subagent notification and carries no news for Almir ("still waiting", "no change", "watcher expired, re-armed", "found nothing stuck"), and for one-line acknowledgements ("got it", "not me", "test received"). If the notification brought a real result or a change, it gets a TL;DR as usual.
+**The tag is exactly one of the seven words**, nothing else inside the parentheses; caveats go after it: `(Update) Unaudited: …`, not `(Update, unaudited)`.
+Pick the most severe tag that applies; never tag something Critical just to get attention.
+Order, most severe first: Critical > Trading > Needs You > Changes > QA > Update > Misc. Trading vs Critical: a broken hard limit, a loss of 2× the expected max drawdown or more, or live trading broken with positions open is Critical even once it has stopped; anything else beyond expectations or unexplained is Trading. A loss limit firing as designed, or a person stopping a strategy, is `(Update)`, not Trading. Trading or Changes that also needs a decision keeps its tag, with the decision in the `🔴 **Needs you:**` block.
+QA vs the others: a QA answer that also needs a decision from Almir is still (QA), with the decision in the `🔴 **Needs you:**` block; Critical still wins over QA.
+The test for Needs You vs Update: does Almir have to do something for the work to continue? Yes → Needs You. No (you're continuing, or it's finished and nothing is left) → Update.
+
+# Reply format: the agent-tooling plugin
+
+The `agent-tooling` plugin draws replies for skimming and puts Almir's decisions on buttons above the
+prompt. Write replies so it can read them:
+
+- **First line** stays the TL;DR line with its tag (above). When a turn ends a piece of work, put the verdict word right
+  after the tag: `Done.`, `Running:`, `Not done:`, `Blocked:`, `Failed:` or `Resolved:`; it is drawn as a colored badge.
+  `Resolved:` means an earlier Critical, Trading or Needs You since Almir's last message no longer applies (the PnL recovered,
+  the fix landed). Example:
+  `🩵 **TL;DR:** (Needs You) Not done: the inventory cap needs your pick.` When nothing is left for Almir, end that line
+  with `You can close this session.`
+- **Decisions for Almir** go in one `🔴 **Needs you:**` block at the end of the reply: a numbered item per decision, its
+  point in bold first, each possible answer as a short quoted reply, the one you recommend marked `(recommended)`:
+  `1. **Inventory cap.** "25" (recommended) or "50"`. Each quoted reply becomes a button; an item without quoted
+  replies is answered in words. A reply that authorises something risky or outward (deploy, restart live, spend, delete,
+  send) starts with `go:` (`"go: restart paper hype_fade"`): it is never pre-picked. Nothing needed from Almir: write
+  `Needs you: nothing.`
+- **Messages Almir sends to someone else** (Slack, email) go in a ```` ```draft ```` fence; its copy button copies the
+  text exactly as written, so write it in the target's own markup (Slack: `*bold*`).
+- **Tables:** a status cell opens with a state word (`Done`, `Running`, `Waiting`, `Blocked`, `Failed`, `Next`), drawn
+  in its color. **Pull requests and issues** as `repo#n` (`te#1712`) become links.
+- **Diagrams:** a ```` ```mermaid ```` fence is drawn as a picture where the terminal can show one; where it can't, it
+  stays a one-line summary, so the reply must still read without it.
+- **A page or link for Almir to open:** `` `! open <path or URL>` `` gets an `[ open ]` button.
+- **Warnings** for a real risk: `> [!WARNING]`.
 
 # Context scales with distance
 
