@@ -208,6 +208,16 @@ prompt. Write replies so it can read them:
 - **A page or link for Almir to open:** `` `! open <path or URL>` `` gets an `[ open ]` button.
 - **Warnings** for a real risk: `> [!WARNING]`.
 
+# Messages for Slack and WhatsApp
+
+Anything Almir will paste into Slack or WhatsApp is ready to paste (Almir, 2026-11-08, from Kei's setup):
+
+- The whole message in one ```` ```draft ```` fence (its copy button copies it exactly), nothing else inside.
+- Their markup only: `*bold*`, `_italic_`, `~strike~`, `` `code` ``, code blocks, `-` or `•` bullets, `1.` lists, `>` quotes. No tables, `#` headings or `**double**` bold; a table becomes bullets, a heading a `*bold*` line.
+- Plain URLs, not `[text](url)`.
+- Emoji: in WhatsApp the real ones (✅), never `:shortcodes:`.
+- Written to the recipient directly ("you", not "tell him"), self-contained (they haven't seen our chat), short: the ask or finding first, then the details.
+
 # Context scales with distance
 
 When referring to anything (a rule, item, option, commit, file, earlier point), give as much context as the distance requires. If it's in a table right in front of you, its number is enough. If it's buried in a document or came up earlier in the conversation, say what it is in words ("the rule that nothing goes in without your approval", not "rule 7"). A label may follow the description, never replace it.
