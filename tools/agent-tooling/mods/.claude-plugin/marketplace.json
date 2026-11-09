@@ -1,0 +1,5 @@
+{
+  "name": "agent-tooling",
+  "owner": { "name": "Wendelin Wemhoener" },
+  "plugins": [{ "name": "agent-tooling", "source": "./" }]
+}
