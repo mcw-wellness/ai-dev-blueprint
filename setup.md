@@ -66,6 +66,27 @@ Perplexity (`perplexity-ask`) was removed 2026-07-02 — Gemini grounded search 
 
 Gemini is **not** an MCP. It's the `/gemini` skill (CLI-based) — see [tool-usage.md](tool-usage.md). This is the web-research tool, and it's a **required** link in the chain (CLI-only; no MCP). If an old `~/.claude/settings.json` still carries a `mcpServers.gemini` (or `perplexity-ask`) block, remove it — those are stale.
 
+## Google Drive (all profiles)
+
+Claude talks to Google Drive through a CLI, not an MCP (Almir, 2026-11-22):
+`~/Documents/GitHub/kaza/vending-id-austria/apps/cli/drive_cli.py` (docs: that repo's `docs/email-access.md`, section
+„Google Drive"). It uploads a local file and prints the link; Markdown and Word become Google Docs. Scope `drive.file`:
+it sees only files it created. Sharing a file stays manual in Drive — Almir decides who sees it.
+
+```bash
+PY=~/.config/spaetitogo-mail/venv/bin/python; CLI=~/Documents/GitHub/kaza/vending-id-austria/apps/cli/drive_cli.py
+$PY $CLI --account almir@software-advantage.com login                          # once per account: browser → Allow
+$PY $CLI --account almir@software-advantage.com upload plan.md --name "Titel"  # → https://docs.google.com/…
+```
+
+| Account | Status |
+|---|---|
+| `almir@software-advantage.com` | ✅ works (token in `~/.config/spaetitogo-mail/`, created 2026-11-22) |
+| `kazazic@gmail.com` (Almir's private Drive) | ⚠️ blocked: the OAuth app „Claude Mail Access" (Cloud project `careful-isotope-512007-b8`, org software-advantage.com) is **Internal** → `Error 403: org_internal`. To enable: Google Auth Platform → Audience → External, add `kazazic@gmail.com` as test user (needs Almir's password re-check in the console) |
+
+Why not an MCP: the claude.ai Google Drive / Google Docs connectors need an org owner's approval in the Eventus
+claude.ai org (card shows only „Request"); a local Drive MCP would hit the same Internal-app block as the CLI.
+
 To manage MCPs for a specific instance:
 
 ```bash
