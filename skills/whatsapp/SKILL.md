@@ -66,6 +66,7 @@ the history WhatsApp sends right after linking. To unlink: remove the device on 
 | `logged this device out (401)` | removed on the phone; relink |
 | `another connection … took over (440)` | a second machine/process uses the same keys |
 | `deadline … reached` after sync | history still arriving; run `sync` again |
+| `no server confirmation within 15 s` on a **group** send | the message usually did arrive (twice on 2026-11-24 in the TCN group, both arrived; the 1:1 send to Nigar was confirmed at once). Don't resend; ask Almir to check the group on his phone, as a 🔴 item in the reply |
 
 Spec, design decisions and review notes: [SPEC.md](SPEC.md). Tests: `npm test` in this folder.
 Install on a new machine: `npm ci` here, then `ln -s "$(pwd)" ~/.claude/skills/whatsapp`.
