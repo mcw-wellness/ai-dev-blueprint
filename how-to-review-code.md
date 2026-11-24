@@ -1,6 +1,8 @@
 # How to review code (post-implementation)
 
-After tests pass, before the PR merges: **three independent reviewers** read the code, **Fable arbitrates** their findings (Opus drives, Fable is the tiebreaker), and every finding is either fixed or explicitly rejected with written rationale.
+After tests pass, before the PR merges: **three independent reviewers** read the code, a **separate Fable session arbitrates** their findings (Opus drives, Fable is the tiebreaker), and every finding is either fixed or explicitly rejected with written rationale.
+
+> Gemini is out of reviews (cost, Almir 2026-11-24); it stays for web research (Flash) and the marketing council.
 
 This is the heart of the blueprint. Running the loop costs tokens and minutes; skipping it costs incidents and regressions.
 
@@ -9,16 +11,16 @@ This is the heart of the blueprint. Running the loop costs tokens and minutes; s
 | Reviewer | Strength | Command |
 |---|---|---|
 | **CodeRabbit** | Conventions, lint-class issues, PR-scope concerns | `/coderabbit:review` |
-| **Gemini** | Architecture, diagnostics, missing abstractions | `/gemini review` |
-| **Codex** | Subtle bugs, edge cases, correctness invariants | `/codex-review review` |
+| **GPT Astra** (Codex) | Subtle bugs, edge cases, correctness invariants | `/codex-review review` |
+| **Fable** (reviewer) | Architecture, diagnostics, missing abstractions | a Fable subagent, given the diff and the spec — not your conclusions |
 
-Each has blind spots the others cover. Running a single reviewer leaves gaps that only surface in production. See [tool-usage.md](tool-usage.md) for concrete Codex-vs-Gemini evidence.
+Each has blind spots the others cover. Running a single reviewer leaves gaps that only surface in production. See [tool-usage.md](tool-usage.md).
 
 ## The loop
 
 ### 1. Commit the draft
 
-Tests pass locally. Code complete. Commit and open a PR (CodeRabbit reacts to PRs; the other two work on local diffs as well).
+Tests pass locally. Code complete. Commit and open a PR (CodeRabbit reacts to PRs and also runs locally with its CLI; the other two work on local diffs).
 
 ### 2. Run all three (parallel)
 
@@ -28,8 +30,7 @@ Kick all three off. They run independently.
 # CodeRabbit on the PR
 /coderabbit:review
 
-# Gemini on the local diff
-/gemini review
+# Fable on the local diff (a subagent with model fable; give it the diff and the spec, not your opinion)
 
 # Codex on the local diff
 /codex-review review
@@ -37,11 +38,11 @@ Kick all three off. They run independently.
 
 ### 3. Collect findings
 
-Each reviewer emits a list of findings. Copy them into one place. Label each with `[CR]`, `[GM]`, `[CX]` so you know who flagged what — you'll refer back during arbitration and when writing the PR description.
+Each reviewer emits a list of findings. Copy them into one place. Label each with `[CR]`, `[FB]`, `[CX]` so you know who flagged what — you'll refer back during arbitration and when writing the PR description.
 
 ### 4. Fable arbitrates
 
-Fable reads all three lists and categorizes each finding (Opus drives the loop; Fable is the arbiter):
+A **fresh** Fable session — not the one that reviewed — reads all three lists and categorizes each finding (Opus drives the loop; Fable is the arbiter):
 
 | Category | What it means | What to do |
 |---|---|---|

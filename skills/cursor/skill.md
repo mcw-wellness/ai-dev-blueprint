@@ -38,8 +38,8 @@ cursor-agent -p --mode ask --trust --output-format text --model composer-2.5 "<p
 
 | When | What runs |
 |---|---|
-| **Default code review** (real feature/PR) | **All three in parallel, in the background**: `/gemini` + `/codex-review` + `/cursor`. Opus reads all three and arbitrates. |
-| **Explicit "cursor review" / "check with Cursor"** | **Cursor only** — skip Gemini and Codex. |
+| **Default code review** (real feature/PR) | The blueprint's chain (`how-to-review-code.md`): GPT Astra (`/codex-review`) + Fable + CodeRabbit, a separate Fable arbitrates. Cursor is an optional fourth angle. |
+| **Explicit "cursor review" / "check with Cursor"** | **Cursor only** — skip the others. |
 | Brainstorming | On request, or as a third voice alongside `/gemini brainstorm`. |
 
 Run the three reviewers concurrently (each `run_in_background: true`), then synthesize. Don't block on Cursor — it's the slowest of the three. See [how-to-review-code.md](../../how-to-review-code.md).

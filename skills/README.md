@@ -20,7 +20,7 @@ Restart Claude Code and the skills will be callable as `/gemini`, `/codex-review
 
 ## What's here
 
-- **`gemini/`** — Run Google Gemini CLI (`/gemini search|review|brainstorm|ask`). Default model: Gemini 3 Pro. Project-context aware.
+- **`gemini/`** — Run Google Gemini CLI (`/gemini search|brainstorm|ask`). Research runs on Flash; not a reviewer since 2026-11-24 (cost). Project-context aware.
 - **`codex-review/`** — Run OpenAI Codex CLI for second-opinion code review (`/codex-review ask "question"` or `/codex-review review`).
 - **`cursor/`** — Run the Cursor Agent CLI (`/cursor review|brainstorm|ask`) on your paid subscription, using Cursor's own Composer 2.5 model. The third independent reviewer alongside Gemini and Codex. Includes Tailscale-MagicDNS troubleshooting (the usual cause of `cursor-agent` connection failures).
 - **`ai-usage/`** — Remaining Claude Code / Codex quota for every local profile: % used per limit, reset times, logged-in account, login expiry. Read-only. Also handy as a terminal command: `ln -s "$(pwd)/ai-usage/ai-usage.py" ~/.local/bin/ai-usage`.
@@ -29,4 +29,4 @@ Restart Claude Code and the skills will be callable as `/gemini`, `/codex-review
 
 ## Usage in the review flow
 
-See [how-to-review-code.md](../how-to-review-code.md) for how Gemini, Codex, and CodeRabbit combine into the triple-review loop with Opus arbitration.
+See [how-to-review-code.md](../how-to-review-code.md) for how GPT Astra (Codex), Fable and CodeRabbit combine into the triple-review loop with Fable arbitration. Gemini is research-only since 2026-11-24 (cost).

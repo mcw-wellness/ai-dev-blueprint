@@ -10,7 +10,10 @@ allowed-tools:
 
 # Gemini CLI Skill
 
-Use the locally installed Google Gemini CLI (`/opt/homebrew/bin/gemini`, v0.27+) for web search, code review, brainstorming, or general Q&A.
+Use the locally installed Google Gemini CLI (`gemini` on PATH, v0.27+ — e.g. under nvm, not always `/opt/homebrew/bin`) for web search, brainstorming, or general Q&A.
+
+> **Not a reviewer any more** (cost, Almir 2026-11-24): plan and code reviews are GPT Astra + Fable + CodeRabbit
+> (`how-to-review-code.md`). Run `review` / `review-principal` only when Almir asks for Gemini by name.
 
 ## Defaults
 
@@ -34,10 +37,11 @@ With stdin:
 
 ### 1. `search` — Web search
 
-Gemini Pro grounds answers in Google Search when the prompt asks for current info.
+Gemini grounds answers in Google Search when the prompt asks for current info. **Research runs on Flash** (cost, Almir
+2026-11-24) — not the Pro-line default.
 
 ```bash
-GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode plan -m gemini-4-argon -p "Search the web and answer with cited sources: <query>"
+GEMINI_CLI_TRUST_WORKSPACE=true gemini --approval-mode plan -m gemini-flash-latest -p "Search the web and answer with cited sources: <query>"
 ```
 
 **Examples:**

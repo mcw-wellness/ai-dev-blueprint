@@ -9,7 +9,7 @@ Character and voice rules live in [soul.md](soul.md) — read that first. This f
 ## Git Workflow
 
 - **Merge strategy: prefer a normal merge commit.** When merging a PR (`gh pr merge`) or a branch locally, default to `--merge` (a true merge commit preserving the branch's history).
-- **Do NOT squash** (`--squash`) unless the project's local `AGENTS.md` explicitly asks for it. Squashing collapses the review-fix trail (Gemini / Codex / CodeRabbit iterations) into a single commit, which hurts blame and rollback.
+- **Do NOT squash** (`--squash`) unless the project's local `AGENTS.md` explicitly asks for it. Squashing collapses the review-fix trail (Codex / Fable / CodeRabbit iterations) into a single commit, which hurts blame and rollback.
 - Rebase (`--rebase`) is acceptable when the user asks for it, but still not the default.
 - If a repo has branch protection that *only* allows squash, note that in the project's `AGENTS.md` and follow it there — don't override the global preference silently.
 
