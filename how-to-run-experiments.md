@@ -43,10 +43,10 @@ scored against). The agent builds it; Almir never builds it by hand.
 
 ## Reviews
 
-Two triple AI reviews per experiment (Almir, 2026-11-08):
+Two AI reviews per experiment (Almir, 2026-11-08; Gemini dropped for cost 2026-11-24):
 
-1. **The plan** for reaching Almir's direction — before the first real run: **Gemini + Codex + Fable**.
-2. **The experiment code** — before its result is reported: **Gemini + Codex + CodeRabbit**
+1. **The plan** for reaching Almir's direction — before the first real run: **GPT Astra (Codex) + Fable**.
+2. **The experiment code** — before its result is reported: **GPT Astra (Codex) + Fable + CodeRabbit**
    (see [how-to-review-code.md](how-to-review-code.md)).
 
 ## Especially for hardware
