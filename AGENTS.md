@@ -21,6 +21,12 @@ Whenever you give me a duration or ETA (how long something will take, when it'll
 
 Format: `ETA ~10 min (now 11:14, finishes ~11:24)`. Without the anchor, "10 min" is useless if I read the message late.
 
+# Long waits
+
+When waiting on a long job (an experiment run, a Codex/Gemini review, a build), wait with `bgwatch`, never blind. If it ends as failed, gone, stuck or too long, tell Almir in the very next message.
+
+`bgwatch` is [tools/bgwatch/bgwatch.py](tools/bgwatch/bgwatch.py); run it under `run_in_background`, its `--help` has the usage.
+
 # Playbooks
 
 **Hard gate — read the relevant playbook before you propose anything.** Not just before coding. Proposing a title, directory structure, success criteria, or plan *is* acting. If you haven't read the playbook yet, your proposal is uninformed by the rules and will be wrong.

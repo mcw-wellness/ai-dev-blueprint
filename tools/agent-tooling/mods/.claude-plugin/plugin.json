@@ -1,0 +1,6 @@
+{
+  "name": "agent-tooling",
+  "version": "0.2.4",
+  "description": "Replies drawn for skimming (verdict and Needs you badges, fitted tables with state colors, GitHub alerts as boxes, headings over a rule, Mermaid fences as pictures, shell calls as description, command and a failure's tail), the Reply band answering a 🔴 Needs you block with reply chips and copying a reply's drafts as rich text, the thread's state after the prompt hint, the tab title led by what the tab needs, and a reload of itself once update.sh pulls newer code",
+  "types": "./types/index.d.ts"
+}

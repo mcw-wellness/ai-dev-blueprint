@@ -18,6 +18,7 @@ Use the locally installed Google Gemini CLI (`/opt/homebrew/bin/gemini`, v0.27+)
 - **Mode:** non-interactive (`-p`).
 - **Approval:** `--approval-mode plan` — a reviewer reads and answers; it must not write. (2026-09-22: under `yolo` a review run edited a branch and committed as the user.) Use `yolo` only when the task is explicitly to make changes.
 - **Timeout:** 5 min (`timeout: 300000`).
+- **Hard limit: 45 min.** Prefix every call with `gtimeout 45m` (from `brew install coreutils`), e.g. `GEMINI_CLI_TRUST_WORKSPACE=true gtimeout 45m gemini …`. The Bash tool's timeout does not apply under `run_in_background`, so without it a hung run never ends. Exit code 124 means it was killed: say so to Almir. (Almir, 2026-11-08, from Kei's setup.)
 
 Canonical invocation:
 ```bash

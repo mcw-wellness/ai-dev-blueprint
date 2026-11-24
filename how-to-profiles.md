@@ -187,6 +187,7 @@ encode. Keep both in sync from the blueprint:
 |---|---|---|
 | **Gemini CLI** | **Web research + independent review — required.** CLI-only (no MCP). | `/gemini` skill wraps the CLI; auth via `gemini` login or `GEMINI_API_KEY`. |
 | **Codex CLI** | Independent reviewer + second driver | `brew install`/npm; `codex login` per home. |
+| **coreutils** (`gtimeout`) | 45-min hard limit on Codex/Gemini calls | `brew install coreutils`. |
 | **CodeRabbit CLI** | Convention/lint-class review | local `coderabbit review --light --committed --base main`. |
 | **Cursor** (`/cursor`) | **Optional** third reviewer — reintroducing, experimental. | Composer 2.5 only. Not required in the default loop. |
 | ~~Perplexity~~ | **Removed** — Gemini replaced it for all web research. | Do not reinstall. |

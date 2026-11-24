@@ -25,6 +25,7 @@ Use the locally installed OpenAI Codex CLI (`/opt/homebrew/bin/codex`) to get a 
 - **Mode selection flags:**
   - `codex exec` — run the agent with a free-form prompt. Codex decides which files to read.
   - `codex review --uncommitted` / `--base <branch>` / `--commit <sha>` — structured review of a diff.
+- **Hard limit: 45 min.** Prefix every call with `gtimeout 45m` (from `brew install coreutils`), e.g. `gtimeout 45m codex exec "<prompt>" < /dev/null`. The Bash tool's timeout does not apply under `run_in_background`, so without it a hung run never ends. Exit code 124 means it was killed: say so to Almir. (Almir, 2026-11-08, from Kei's setup.)
 - **Timeout:** 5 min default (`timeout: 300000`). For spec↔source audits that span 1000+ lines across multiple files, use 10 min (`timeout: 600000`) and run in the background.
 - **Image generation:** Codex has an internal image-gen tool. Invoke with `codex exec --sandbox workspace-write "<visual prompt>. Save to <ABS_PATH>." < /dev/null` — sandbox MUST be `workspace-write` so it can copy from `~/.codex/generated_images/<session>/` to your path. **Fire sequentially, not in parallel** — concurrent calls produce duplicate output files. Gemini CLI does NOT have a real image-gen tool (it silently falls back to writing PIL scripts).
 
