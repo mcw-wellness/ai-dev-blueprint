@@ -23,6 +23,11 @@ Which AI handles which job, and why. The short answer: use multiple models for i
     explicitly rather than relying on the default. (Confirmed 2026-07-29.)
 - **Perplexity is removed** — Gemini replaced it for all web research. Do not reinstall or call it.
 - **"Ask Codex" / "check with Codex"** always goes through the `/codex-review` skill, never a standalone tool.
+- **An agent calling Codex uses the plain default `codex` command** (`codex exec …`), never a profile launcher
+  (`codex-vvs`, `codex-almir`). The prompt goes in as an argument or on stdin with `-`; a call that waits on stdin
+  hangs forever. (Almir, 2026-11-15: `codex-vvs` had an expired login, two calls hung 30 min, then 401.
+  Again 2026-11-20: a review sent to `codex-vvs` died on 401 — no `auth.json` in `~/.codex-vvs/`; Almir: „use codex
+  standard not codex-vvs, and document this".)
 - **Default code review = Gemini + Codex + CodeRabbit in parallel, in the background**; **Fable** reads all three and arbitrates (not Opus). Cursor is **optional/experimental** — add it when you want a fourth angle; explicit "cursor review" / "check with Cursor" = Cursor only (`/cursor`), skipping the others.
 - **Cursor uses Composer 2.5 only** (never `-fast`, never another model family). If `cursor-agent` fails with "Connection lost / exceeded max retries", **check Tailscale first** (MagicDNS breaks its streaming connection) — see the `/cursor` skill's troubleshooting.
 - **Never install Python packages into system Python.** Always `python3 -m venv` first.

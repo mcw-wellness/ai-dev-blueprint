@@ -218,6 +218,18 @@ Anything Almir will paste into Slack or WhatsApp is ready to paste (Almir, 2026-
 - Emoji: in WhatsApp the real ones (✅), never `:shortcodes:`.
 - Written to the recipient directly ("you", not "tell him"), self-contained (they haven't seen our chat), short: the ask or finding first, then the details.
 
+# Documents for other people
+
+Anything written for someone else (a page, brief, PR description, Slack message, doc) has one goal:
+**readability and understandability**. It carries the findings, the evidence, the proposal and the asks,
+nothing else (Almir, 2026-11-11, after a brief for a PickTrace engineer included a "what we got wrong" box).
+
+- No account of our own process: no corrections we made on the way, no earlier wrong numbers, no
+  "we first thought…". Show the current, correct state only. Corrections belong in our audit logs.
+- Every sentence must help the reader understand or act. Clarity, not confession.
+- No scope disclaimers: no "what this does not fix", "out of scope" or "not addressed" sections. Nobody
+  expects a fix to fix everything. If such content seems needed, **ask Almir first** (Almir, 2026-11-11).
+
 # Context scales with distance
 
 When referring to anything (a rule, item, option, commit, file, earlier point), give as much context as the distance requires. If it's in a table right in front of you, its number is enough. If it's buried in a document or came up earlier in the conversation, say what it is in words ("the rule that nothing goes in without your approval", not "rule 7"). A label may follow the description, never replace it.
