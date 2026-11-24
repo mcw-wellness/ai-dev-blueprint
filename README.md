@@ -9,7 +9,7 @@ Each file is a focused rulebook that can be loaded on demand. Drop the whole thi
 ### Baseline (applies to every step)
 - [`philosophy.md`](philosophy.md) — KISS, YAGNI, TDD
 - [`spec-anchored.md`](spec-anchored.md) — spec vs finding vs ADR, Q-NNN open questions, documentation structure
-- [`tool-usage.md`](tool-usage.md) — when to use Gemini / Codex / CodeRabbit / Cursor (Fable arbitrates)
+- [`tool-usage.md`](tool-usage.md) — when to use Codex (GPT Astra) / Fable / CodeRabbit / Gemini (research) / Cursor (Fable arbitrates)
 
 ### Machine & personal config (auto-loaded via `AGENTS.md`)
 - [`setup.md`](setup.md) — multi-machine paths, multi-instance Claude Code + Codex layout, MCP servers
@@ -19,8 +19,8 @@ Each file is a focused rulebook that can be loaded on demand. Drop the whole thi
 
 ### Playbooks (read on demand)
 - [`how-to-develop.md`](how-to-develop.md) — the 8-step loop + fast track for bug fixes
-- [`how-to-review-spec.md`](how-to-review-spec.md) — pre-code plan review (Gemini + Codex)
-- [`how-to-review-code.md`](how-to-review-code.md) — Gemini + Codex + CodeRabbit, Fable arbitrates
+- [`how-to-review-spec.md`](how-to-review-spec.md) — pre-code plan review (Fable + GPT Astra)
+- [`how-to-review-code.md`](how-to-review-code.md) — GPT Astra + Fable + CodeRabbit, a separate Fable arbitrates
 - [`how-to-write-tests.md`](how-to-write-tests.md) — 15 rules, Given/When/Then, DAMP > DRY
 - [`how-to-run-experiments.md`](how-to-run-experiments.md) — scientific method, hardware-friendly
 - [`how-to-reverse-engineer.md`](how-to-reverse-engineer.md) — legacy code → spec → new code
@@ -103,8 +103,8 @@ Per-project specs, ADRs, and experiments use the other starters in [project-leve
 |---|---|
 | Primary driver | Claude Opus |
 | Final review arbitration | **Fable** (the tiebreaker — not Opus) |
-| Plan review (pre-code) | Gemini + Codex |
-| Code review (post-code) | Gemini + Codex + CodeRabbit |
+| Plan review (pre-code) | Fable + GPT Astra (Codex) |
+| Code review (post-code) | GPT Astra (Codex) + Fable + CodeRabbit |
 | Optional third reviewer | Cursor (`/cursor`) — experimental, reintroducing |
 | PR review | CodeRabbit (GitHub-native) |
 | Web research / lookup | Gemini CLI (required; Perplexity removed) |

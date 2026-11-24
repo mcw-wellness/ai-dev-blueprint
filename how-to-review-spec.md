@@ -1,6 +1,6 @@
 # How to review a plan (pre-code)
 
-Before writing a line of code, the plan goes through two independent reviewers: **Gemini** and **Codex**. This catches bad plans while they're still cheap to fix — before you've committed to an architecture.
+Before writing a line of code, the plan goes through two independent reviewers: **Fable** and **GPT Astra** (Codex). This catches bad plans while they're still cheap to fix — before you've committed to an architecture.
 
 This is step 3 of the 8-step loop in [how-to-develop.md](how-to-develop.md).
 
@@ -18,19 +18,15 @@ If the plan is vague ("add a new endpoint"), the review will be useless. Tighten
 
 ## Running the reviews
 
-### Gemini
+> Gemini is out of reviews (cost, Almir 2026-11-24); it stays for web research (Flash) and the marketing council.
 
-```bash
-/gemini review
-```
+### Fable
 
-Or with an explicit prompt:
+A Fable subagent (model `fable`), given the plan and the spec — not your own view of them:
 
-```bash
-/gemini ask "<paste the plan> — is the architecture sound? what's missing diagnostically? what would be painful to change later?"
-```
+> "<the plan> — is the architecture sound? what's missing diagnostically? what would be painful to change later?"
 
-Gemini catches:
+Fable catches:
 - **Architectural issues** ("this introduces a circular dependency between X and Y")
 - **Diagnostic gaps** ("you have no plan for observing when this goes wrong")
 - **Missing abstractions** that will cost you later

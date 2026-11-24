@@ -8,15 +8,17 @@ Which AI handles which job, and why. The short answer: use multiple models for i
 |---|---|---|
 | Primary coding / driver | Claude Opus | Best at judgment, synthesis, multi-file reasoning |
 | **Final review arbitration** | **Fable** | The tiebreaker across all reviewers — not Opus |
-| Plan review (pre-code) | Gemini + Codex | Independent second opinions catch bad plans early |
-| Code review (post-code) | Gemini + Codex + CodeRabbit | Multi-review; every finding must be addressed or rejected |
+| Plan review (pre-code) | Fable + GPT Astra (Codex) | Independent second opinions catch bad plans early |
+| Code review (post-code) | GPT Astra (Codex) + Fable + CodeRabbit | Multi-review; every finding must be addressed or rejected |
 | Optional third review + brainstorm | Cursor (`/cursor` skill) | Composer 2.5. **Available and verified working** (2026-08-02). Optional — not in the default loop. |
-| Web research / search / brainstorm | Gemini (`/gemini` skill) | **Required** link. CLI-only (no MCP). Default model `pro`. |
+| Web research / search / brainstorm | Gemini (`/gemini` skill) | **Required** link. CLI-only (no MCP). Research runs on **Flash** (`gemini-flash-latest`, Almir 2026-11-24: cost). |
 
 ## Hard rules
 
-- **Gemini MUST run on a PRO model.** **Never Flash** — too weak for brainstorm/research/visual work; using it is a mistake.
-  - **CLI (`/gemini` skill):** `-m pro`. This is the required link for web research.
+- **Gemini is out of reviews** (cost, Almir 2026-11-24). It stays for web research and the marketing council.
+- **Web research runs on Gemini Flash** (`-m gemini-flash-latest`, Almir 2026-11-24: cost). This replaced the
+  earlier "Pro only, never Flash" rule. Other Gemini work (brainstorm, visual/3D, the marketing council) stays on Pro.
+  - **CLI (`/gemini` skill):** `search` defaults to Flash; everything else to the Pro-line default.
   - **MCP (`mcp__gemini__*`, where a project has it):** the working Pro model is **`gemini-3.1-pro-preview`**.
     🚨 **`gemini-3-pro-preview` 404s** — the call fails with `MCP error -32603 ... Not Found`. It is
     still listed in the tool's enum, so it looks valid and isn't. Pass `gemini-3.1-pro-preview`
@@ -28,7 +30,7 @@ Which AI handles which job, and why. The short answer: use multiple models for i
   hangs forever. (Almir, 2026-11-15: `codex-vvs` had an expired login, two calls hung 30 min, then 401.
   Again 2026-11-20: a review sent to `codex-vvs` died on 401 — no `auth.json` in `~/.codex-vvs/`; Almir: „use codex
   standard not codex-vvs, and document this".)
-- **Default code review = Gemini + Codex + CodeRabbit in parallel, in the background**; **Fable** reads all three and arbitrates (not Opus). Cursor is **optional/experimental** — add it when you want a fourth angle; explicit "cursor review" / "check with Cursor" = Cursor only (`/cursor`), skipping the others.
+- **Default code review = GPT Astra (Codex) + Fable + CodeRabbit in parallel, in the background**; a **separate Fable session** reads all three and arbitrates (not Opus, and not the Fable that reviewed). Cursor is **optional/experimental** — add it when you want a fourth angle; explicit "cursor review" / "check with Cursor" = Cursor only (`/cursor`), skipping the others.
 - **Cursor uses Composer 2.5 only** (never `-fast`, never another model family). If `cursor-agent` fails with "Connection lost / exceeded max retries", **check Tailscale first** (MagicDNS breaks its streaming connection) — see the `/cursor` skill's troubleshooting.
 - **Never install Python packages into system Python.** Always `python3 -m venv` first.
 

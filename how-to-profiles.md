@@ -170,9 +170,9 @@ Then per home:
 The two tools review through **different** chains — this is deliberate, and it's what the profiles
 encode. Keep both in sync from the blueprint:
 
-- **Claude** reviews with **Gemini + Codex + CodeRabbit** (+ optional Cursor), and **Fable
-  arbitrates**. Source: `tool-usage.md` / `how-to-review-code.md` (auto-loaded via `AGENTS.md`).
-- **Codex** reviews with **Gemini + Fable**, runs Claude read-only through the authenticated
+- **Claude** reviews with **GPT Astra (Codex) + Fable + CodeRabbit** (+ optional Cursor), and a **separate
+  Fable session arbitrates**. Gemini is out of reviews (cost, Almir 2026-11-24). Source: `tool-usage.md` / `how-to-review-code.md` (auto-loaded via `AGENTS.md`).
+- **Codex** reviews with **Fable**, runs Claude read-only through the authenticated
   `claude-eventus` instance using Fable, and **Fable arbitrates (never Opus)**. Source:
   [`codex-review-policy.md`](codex-review-policy.md), symlinked into each `~/.codex*/AGENTS.md`
   (Step 3).
@@ -185,7 +185,7 @@ encode. Keep both in sync from the blueprint:
 
 | Tool | Role | Install / auth |
 |---|---|---|
-| **Gemini CLI** | **Web research + independent review — required.** CLI-only (no MCP). | `/gemini` skill wraps the CLI; auth via `gemini` login or `GEMINI_API_KEY`. |
+| **Gemini CLI** | **Web research (Flash) — required.** Not a reviewer since 2026-11-24 (cost). CLI-only (no MCP). | `/gemini` skill wraps the CLI; auth via `gemini` login or `GEMINI_API_KEY`. |
 | **Codex CLI** | Independent reviewer + second driver | `brew install`/npm; `codex login` per home. |
 | **coreutils** (`gtimeout`) | 45-min hard limit on Codex/Gemini calls | `brew install coreutils`. |
 | **CodeRabbit CLI** | Convention/lint-class review | local `coderabbit review --light --committed --base main`. |

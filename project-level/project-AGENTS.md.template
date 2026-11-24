@@ -9,14 +9,14 @@
 This project follows the [ai-dev-blueprint](https://github.com/kaza/ai-dev-blueprint). All principles and playbooks apply:
 
 - **Baseline:** KISS, YAGNI, TDD, spec-anchored (see `philosophy.md`, `spec-anchored.md` in the blueprint)
-- **Triple AI review is STRICTLY MANDATORY** for every PR: Gemini + Codex + CodeRabbit. See `how-to-review-code.md`.
+- **Triple AI review is STRICTLY MANDATORY** for every PR: GPT Astra (Codex) + Fable + CodeRabbit. See `how-to-review-code.md`.
 - **Regression prevention:** every review finding that results in a code fix MUST have a corresponding automated test that would have caught it.
 
 ### Project-specific overrides
 
 This section documents where **this project deviates from the blueprint**. Leave empty if no deviations. Real examples of what goes here:
 
-- **Fast track:** Disabled — all PRs go through full triple review (Gemini + Codex + CodeRabbit). Reason: production cutover stakes; one bad merge is a revenue incident.
+- **Fast track:** Disabled — all PRs go through full triple review (GPT Astra + Fable + CodeRabbit). Reason: production cutover stakes; one bad merge is a revenue incident.
 - **Extra reviewer:** Security review (`/security-review`) is mandatory for any change to auth, session, or token-handling code.
 - **Spec location:** Specs live in `docs/specs/` rather than `specs/` (pre-existing convention in this repo).
 - **Test threshold:** Unit-test coverage floor is 90% (raised from blueprint default of no threshold) due to regulated-system requirements.

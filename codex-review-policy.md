@@ -5,7 +5,7 @@
 *The Claude-side equivalent lives in [`tool-usage.md`](tool-usage.md) — the two chains differ on*
 *purpose; keep both accurate.*
 
-- Use Gemini Pro and Fable for architecture, plan, and code reviews.
+- Use Fable for architecture, plan, and code reviews. Do not use Gemini for reviews (cost, Almir 2026-11-24).
 - Run every Claude review read-only through the authenticated `claude-eventus`
   Claude Code instance using Fable.
 - Use Fable for final review arbitration. Do not use Opus for reviews.
