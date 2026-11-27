@@ -84,6 +84,14 @@ $PY $CLI --account almir@software-advantage.com upload plan.md --name "Titel"  #
 | `almir@software-advantage.com` | ✅ works (token in `~/.config/spaetitogo-mail/`, created 2026-11-22) |
 | `kazazic@gmail.com` (Almir's private Drive) | ⚠️ blocked: the OAuth app „Claude Mail Access" (Cloud project `careful-isotope-512007-b8`, org software-advantage.com) is **Internal** → `Error 403: org_internal`. To enable: Google Auth Platform → Audience → External, add `kazazic@gmail.com` as test user (needs Almir's password re-check in the console) |
 
+## Gmail: which inbox, which way (Almir, 2026-11-27: „I want you to know how to read my Gmail")
+
+| Mailbox | How Claude reads it |
+|---|---|
+| `hello@spaetitogo.at`, `hello@own-words.pro` | Gmail API, `vending-id-austria/apps/cli/gmail_cli.py` (read + send; send only with Almir's yes) |
+| `almir@software-advantage.com` | Gmail API read-only, token `~/.config/spaetitogo-mail/token-almir@software-advantage.com-readonly.json` (`marketing/accounts/google-admin.md`) |
+| **`kazazic@gmail.com`** (private) | **Chrome, via the claude-in-chrome tools**: Almir's Chrome is signed in as account `u/0`. Open a new tab with a search URL, e.g. `https://mail.google.com/mail/u/0/#search/<query>` (Gmail search syntax, URL-encoded), wait ~3–4 s, then `get_page_text`. Read only; close the tab afterwards. The API route is blocked (OAuth app is Internal, see the Drive table above). First used 2026-11-27 to look for a Google Ads invitation |
+
 Why not an MCP: the claude.ai Google Drive / Google Docs connectors need an org owner's approval in the Eventus
 claude.ai org (card shows only „Request"); a local Drive MCP would hit the same Internal-app block as the CLI.
 
